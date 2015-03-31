@@ -4,6 +4,7 @@
 # Build directories
 artifacts/
 build/nuget.exe
+pester/*
 
 # User-specific files
 *.suo
