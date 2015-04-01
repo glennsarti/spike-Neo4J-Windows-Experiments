@@ -48,6 +48,8 @@ Get-Neo4jSetting | Remove-Neo4jSetting -Confirm:$false
 
 ## Stuff to do
 
+* Add filtering to the Get-Neo4jSetting cmdlet?
+
 * Add in pre-canned cmdlet to do a basic Neo4j Server setup e.g. Set Http and https port, enable/disable https, set memory, enable GC logging
 
 * Add in pre-canned query to enable and disable clustering (I need to setup clustering first to try this)
