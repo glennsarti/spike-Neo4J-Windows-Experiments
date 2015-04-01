@@ -1,8 +1,9 @@
-Function Get-Neo4jProperties
+Function Get-Neo4jSettings
 {
-  [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Low')]
+  [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Low',DefaultParameterSetName='ByDefault')]
   param (
     [Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByHome')]
+    [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
     [alias('Home')]
     [string]$Neo4jHome
     
@@ -21,6 +22,11 @@ Function Get-Neo4jProperties
   {
     switch ($PsCmdlet.ParameterSetName)
     {
+      "ByDefault"
+      {
+        $Neo4jServer = Get-Neo4jServer
+        if ($Neo4jServer -eq $null) { return }
+      }
       "ByHome"
       {
         $Neo4jServer = Get-Neo4jServer -Neo4jHome $Neo4jHome
@@ -33,6 +39,11 @@ Function Get-Neo4jProperties
           Write-Error "The specified Neo4j Server object is not valid"
           return
         }
+      }
+      default
+      {
+        Write-Error "Unknown Parameterset $($PsCmdlet.ParameterSetName)"
+        return
       }
     } 
    
@@ -47,11 +58,12 @@ Function Get-Neo4jProperties
       {
         $keyPairsFromFile.GetEnumerator() | ForEach-Object -Process `
         {
-          $properties = @{
+          $properties = @{          
             'Name' = $_.Name;
             'Value' = $_.Value;
             'ConfigurationFile' = $filename;
-            'IsDefault' = $false
+            'IsDefault' = $false;
+            'Neo4jHome' = $Neo4jServer.Home;
           }
           Write-Output (New-Object -TypeName PSCustomObject -Property $properties)
         }
