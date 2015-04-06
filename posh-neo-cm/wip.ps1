@@ -8,7 +8,9 @@ Import-Module "$PSScriptRoot\src\NeoTechnologies.Neo4jForWindows.psd1" | Out-Nul
 #"C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0","C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jServer
 Write-Host "---" -ForegroundColor Yellow
 
-Get-Neo4jServer "C:\tools\neo4j-community\neo4j-community-2.2.0"
+#Get-Neo4jServer "C:\tools\neo4j-community\neo4j-community-2.2.0"
+
+Get-Neo4jSettings -Home "C:\tools\neo4j-community\neo4j-community-2.2.0"
 
 #Get-Neo4jSettings | ConvertTo-Json
 

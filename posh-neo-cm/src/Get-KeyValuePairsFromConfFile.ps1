@@ -21,7 +21,7 @@ Function Get-KeyValuePairsFromConfFile
       if ($matches -ne $null) { $matches.Clear() }
       if ($line -match '^([^=]+)=(.+)$')
       {
-        $properties."$($matches[1])" = $matches[2]
+        $properties."$($matches[1].Trim())" = $matches[2].Trim()
       }
     }
     Write-Output $properties

@@ -3,7 +3,6 @@ Function Get-Neo4jSettings
   [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Low',DefaultParameterSetName='ByDefault')]
   param (
     [Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByHome')]
-    [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
     [alias('Home')]
     [string]$Neo4jHome
     
@@ -52,7 +51,14 @@ Function Get-Neo4jSettings
     {
       $filename = $_
       $filePath = Join-Path -Path $Neo4jServer.Home -ChildPath "conf\$filename"
-      $keyPairsFromFile = Get-KeyValuePairsFromConfFile -filename $filePath
+      if (Test-Path -Path $filePath)
+      {
+        $keyPairsFromFile = Get-KeyValuePairsFromConfFile -filename $filePath
+      }
+      else
+      {
+        $keyPairsFromFile = $null
+      }
       
       if ($keyPairsFromFile -ne $null)
       {

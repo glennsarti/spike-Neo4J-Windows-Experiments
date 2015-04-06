@@ -20,6 +20,22 @@ Function New-MockNeo4jInstall($neoVersion = '99.99', [switch]$IsCommunityServer,
   # Create the files
   if ($IsCommunityServer -or $IsEnterpriseServer) { "TestFile" | Set-Content -Path "$rootDir\system\lib\neo4j-server-$neoVersion.jar" | Out-Null }
   if ($IsEnterpriseServer) { "TestFile" | Set-Content -Path "$rootDir\system\lib\neo4j-server-enterprise-$neoVersion.jar" | Out-Null }
+
+  # Create a mock neo4j.properties file
+  @"
+################################################################
+# Neo4j
+#
+# neo4j.properties - database tuning parameters
+#
+################################################################
+
+setting1=value1
+setting2=value2
+#setting3=value3
+"@ | Out-File -FilePath "$rootDir\conf\neo4j.properties" -Encoding ASCII -Force -Confirm:$false
+
+
     
   #Write-Host (dir $rootDir -recurse) -Foreground Cyan
 }
