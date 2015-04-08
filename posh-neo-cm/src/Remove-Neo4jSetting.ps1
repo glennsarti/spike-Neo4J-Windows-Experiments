@@ -23,6 +23,11 @@ Function Remove-Neo4jSetting
     [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
     [alias('Setting')]
     [string]$Name
+
+    ,[Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
+    [AllowNull()]
+    [AllowEmptyString()]
+    [string]$Value = ''
   )
   
   Begin

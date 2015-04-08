@@ -29,6 +29,10 @@ Function Set-Neo4jSetting
     [Parameter(Mandatory=$true,ParameterSetName='ByServerObject')]
     [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
     [string]$Value
+    
+    # This parameter is used only for parameterset detection
+    ,[Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
+    [string]$IsDefault
 
     ,[Parameter(Mandatory=$false)]
     [switch]$Force = $false
