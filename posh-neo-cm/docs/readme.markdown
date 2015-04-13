@@ -63,6 +63,11 @@ Get-Neo4jSetting | Remove-Neo4jSetting -Confirm:$false
 * Start/Stop/Restart Neo4j Server Service?
 
 
+**ISSUES**
+
+Doesnt' handle keys with the same name e.g. `wrapper.java.additional` in `neo4j-wrapper.conf`.  Need to figure out a way around it.
+
+
 
 ## Cmdlet Documentation
 

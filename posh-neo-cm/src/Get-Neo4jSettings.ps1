@@ -8,9 +8,6 @@ Function Get-Neo4jSettings
     
     ,[Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByServerObject')]
     [PSCustomObject]$Neo4jServer
-
-    #,[Parameter(Mandatory=$false,ValueFromPipeline=$false)]
-    #[string]$Filter = ''
   )
   
   Begin
@@ -46,6 +43,7 @@ Function Get-Neo4jSettings
       }
     } 
    
+     $ConfiguredSettings = ""
    
     'neo4j.properties','neo4j-server.properties','neo4j-wrapper.conf' | ForEach-Object -Process `
     {
@@ -64,7 +62,7 @@ Function Get-Neo4jSettings
       {
         $keyPairsFromFile.GetEnumerator() | ForEach-Object -Process `
         {
-          $properties = @{          
+          $properties = @{
             'Name' = $_.Name;
             'Value' = $_.Value;
             'ConfigurationFile' = $filename;
@@ -72,8 +70,47 @@ Function Get-Neo4jSettings
             'Neo4jHome' = $Neo4jServer.Home;
           }
           Write-Output (New-Object -TypeName PSCustomObject -Property $properties)
+          $ConfiguredSettings = $ConfiguredSettings + "|$($filename);$($_.Name)"
         }
       }
+    }
+    
+    $defaultsXML = Join-Path -Path $PSScriptRoot -ChildPath 'neo4j-default-settings.xml'
+    if (Test-Path -Path $defaultsXML)
+    {
+      $defaultsXML = [xml](Get-Content -Path $defaultsXML)
+      
+      $defaultsXML.selectNodes('/defaults/section') | ForEach-Object -Process `
+      {
+        $node = $_
+        $processSection = $true
+        if ( ($node.versionregex -ne $null) -and ($processSection) )
+        {
+          $processSection = ( $Neo4jServer.ServerVersion -match ([string]$node.versionregex) )
+        }
+        if ( ($node.editionregex -ne $null) -and ($processSection) )
+        {
+          $processSection = ( $Neo4jServer.ServerType -match ([string]$node.editionregex) )
+        }
+        
+        if ( $processSection )
+        {
+          $node.selectNodes("setting") | ForEach-Object -Process `
+          {
+            $properties = @{
+              'Name' = $_.name;
+              'Value' = $_."#text";
+              'ConfigurationFile' = $_.file;
+              'IsDefault' = $true;
+              'Neo4jHome' = $Neo4jServer.Home;
+            }
+            # Only emit the default value if it was not configured
+            $hash = "|$($_.file);$($_.name)"
+            if ($ConfiguredSettings.IndexOf($hash) -eq -1) { Write-Output (New-Object -TypeName PSCustomObject -Property $properties) }
+          }
+        }
+      }
+      
     }
   }
   
