@@ -44,12 +44,20 @@ choco install notepadplusplus
 
 ### Create the Virtual Machine
 
-- Clone the repository on Windows. 
+**Clone the repository on Windows**
 ```
 git clone <git source URL> c:\DevOpsDays
 ```
-**Ignore the file errors as we really only the need the Vagrant setup and support files.**
+*Note - Ignore the file errors as we really only the need the Vagrant setup and support files*
 
+**Configure Vagrant**
+Edit `C:\DevOpsDays\VagrantFile` and uncomment the following lines.  This is required for the FTP server that will be installed later;
+```
+  config.vm.network "forwarded_port", guest: 21, host: 2121
+  config.vm.network "forwarded_port", guest: 10100, host: 10100
+```
+
+**Start Vagrant**
 Open an administrator command prompt and start the Vagrant process
 ```
 CD /D C:\DevOpsDays
@@ -61,57 +69,87 @@ Once the build process has finished try the website by browsing to `http://127.0
 
 ### Install an FTP server in the Virtual Machine
 
-5. Install an FTP server in the vm
-SSH into the vm (127.0.0.1:2222)
+**Install an FTP Server**
+SSH into the Virtual Machine (127.0.0.1 Port 2222).  Use the default vagrant credentials (both username and password are "vagrant")
+
+Install VSFTPD using the following command line;
+```
 sudo apt-get install vsftpd
+```
+
+**Configure the FTP Server**
+Edit the configuration file.  This guide uses nano, but use an editor you are comfortable with
+```
 sudo nano /etc/vsftpd.conf
+```
+Add the following text at the top;
+```
 local_enable=YES
 write_enable=YES
 pasv_enable=Yes
 pasv_max_port=10100
 pasv_min_port=10100
 pasv_address=127.0.0.1
+```
+Save the changes to the configuration file.  This enables users to login and write files and enables Passive mode transfers. Passive mode is required as the Virtual Machine is behind a NAT network.
+
+Restart the FTP server
+```
 sudo service vsftpd restart
+```
+Test the connection to the FTP server `ftp://127.0.0.1:2121`.  If the connection is successful but you are unable to do a directory listing then there may be an issue with the passive transfer settings.
 
-Try an ftp connection to 127.0.0.1 port 2021
+### Clone the repo into the Virtual Machine
 
-6. Remove the Vagrant shared/sync folder and restart the VM In Virtualbox edit the settings for the virtual machine Remove the vagrant shared folder
+**Remove the Vagrant shared folder**
+* Open Virtual Box and edit the settings for the Virtual Machine
+* Open the Shared Folders settings
+* Remove the Vagrant shared folder
 
-In the SSH session
+**Restart the Virtual Machine**
+A restart is required to remove the shared folder.
+Login using SSH and restart the Virtual Machine
+```
 sudo shutdown -r now
+```
 
-7. Clone the repository
-SSH into the VM
-
+**Clone the repository**
+Once the Virtual Machine has booted login using SSH
+```
 sudo chown vagrant /vagrant
+git clone <git source URL> /vagrant
+```
+This changes the owner of the vagrant directory from root to vagrant and then clones the repository into the vagrant directory.
 
-git clone <clone url> /vagrant
+*Remember to checkout and pull any other branches you require*
 
-Note - remember to checkout the appropriate branches too
 
-8. Do a Webby build
-SSH into the VM
+### Start Webby
 
+Login using SSH
+
+You can do a one off webby build
+```
 cd /vagrant/site
 webby build
-
-or to build continuously
-
+```
+or watch the filesystem and perform a build when files change
+```
 cd /vagrant/site
 webby autobuild
-
+```
 Browse to http://127.0.0.1:8000 to see your handy work
 
-9. Update the files in /vagrant using an FTP client or FTP plugin (e.g.
-NppFTP in Notepad++)
+### Edit the website
 
-Remember to do a Webby build to see the results of the changes
+Now that you have a functional webby development environment and a good git clone it's time to make some edits.  You can upload files from your Windows desktop using an FTP client, like FileZilla.  A better approach would be to use a text editor like Notepad++ with an FTP plugin.
 
 
-10. Use the standard git commands to push your changes back to your repo.
+### Other notes
 
-Don't forget to setup git for the first time http://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
+You can use standard git commands in the Virtual Machine to commit and push changes back to the remote repository.
+
+Don't forget to setup git for the first time
+http://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
 https://help.github.com/articles/keeping-your-email-address-private/
-
-
 
