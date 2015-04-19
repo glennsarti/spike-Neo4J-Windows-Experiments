@@ -150,6 +150,7 @@ Now that you have a functional webby development environment and a good git clon
 You can use standard git commands in the Virtual Machine to commit and push changes back to the remote repository.
 
 Don't forget to setup git for the first time
-http://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
-https://help.github.com/articles/keeping-your-email-address-private/
 
+http://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
+
+https://help.github.com/articles/keeping-your-email-address-private/
