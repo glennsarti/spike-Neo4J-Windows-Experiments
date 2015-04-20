@@ -35,13 +35,22 @@ Describe "Get-KeyValuePairsFromConfFile" {
       $result.Count | Should Be 1
       $result.setting1 | Should Be 'value1' 
     }
-    It "ignore duplicate entries" {
-      "setting1=value1`n`rsetting1=value2`n`rsetting1=value3`n`rsetting1=value4`n`rsetting1=value5" | Out-File -FilePath $mockFile -Encoding ASCII -Force -Confirm:$false            
+    It "single entries are strings" {
+      "setting1=value1" | Out-File -FilePath $mockFile -Encoding ASCII -Force -Confirm:$false            
       
       $result = Get-KeyValuePairsFromConfFile -Filename $mockFile
       
       $result.Count | Should Be 1
-      $result.setting1 | Should Be 'value5' 
+      $result.setting1 | Should Be 'value1' 
+      $result.setting1.GetType().ToString() | Should Be 'System.String' 
+    }
+    It "duplicate entries are arrays" {
+      "setting1=value1`n`rsetting1=value2`n`rsetting1=value3`n`rsetting1=value4`n`rsetting1=value5" | Out-File -FilePath $mockFile -Encoding ASCII -Force -Confirm:$false            
+      
+      $result = Get-KeyValuePairsFromConfFile -Filename $mockFile
+      $result.Count | Should Be 1
+      $result.setting1.GetType().ToString() | Should Be 'System.Object[]' 
+      $result.setting1.Count | Should Be 5
     }
     It "complex regex test" {
       "setting1=value1`n`rsetting2`n`r=value2" | Out-File -FilePath $mockFile -Encoding ASCII -Force -Confirm:$false            

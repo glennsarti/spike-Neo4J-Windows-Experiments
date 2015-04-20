@@ -28,7 +28,7 @@ Function Set-Neo4jSetting
     [Parameter(Mandatory=$true,ParameterSetName='ByHome')]
     [Parameter(Mandatory=$true,ParameterSetName='ByServerObject')]
     [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
-    [string]$Value
+    [string[]]$Value
     
     # This parameter is used only for parameterset detection
     ,[Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
@@ -93,7 +93,7 @@ Function Set-Neo4jSetting
     
     # See if the setting is already defined
     $settingChanged = $false
-    $settingFound = $false
+    $valuesSet = @()
     $newContent = (Get-Content -Path $filePath | ForEach-Object -Process `
     {
       $originalLine = $_
@@ -105,17 +105,29 @@ Function Set-Neo4jSetting
       if ($matches -ne $null) { $matches.Clear() }
       if ($line -match "^$($Name)=(.+)`$")
       {
-        $settingFound = $true
-        if ($matches[1] -ne $Value)
+        $currentValue = $matches[1]
+        if (-not $Value.Contains($currentValue))
         {
-          $originalLine = "$($Name)=$($Value)"
+          $originalLine = "donotwrite"
           $settingChanged = $true
         }
+        else
+        {
+          $valuesSet += $currentValue
+        }
       }
-      Write-Output $originalLine
+      if ($originalLine -ne "donotwrite") { Write-Output $originalLine }
     })
-    # Append it to the file if it didn't exist    
-    if (-not $settingFound) { $newContent += "$($Name)=$($Value)"; $settingChanged = $true }
+    # Check if any values were not written and append if not
+    $Value | ForEach-Object -Process `
+    {
+      if (-not $valuesSet.Contains($_))
+      {
+        if ($newContent -eq $null) { $newContent = @() }
+        if ($newContent.GetType().ToString() -eq 'System.String') { $newContent = @($newContent) }
+        $newContent += "$($Name)=$($_)"; $settingChanged = $true
+      }
+    }
     
     # Modify the settings file if needed
     if ($settingChanged)
@@ -125,13 +137,21 @@ Function Set-Neo4jSetting
         Set-Content -Path "$filePath" -Encoding ASCII -Value $newContent -Force:$Force -Confirm:$false | Out-Null
       }  
     }  
-
     $properties = @{
       'Name' = $Name;
-      'Value' = $Value;
+      'Value' = $null;
       'ConfigurationFile' = $ConfigurationFile;
       'IsDefault' = $false;
       'Neo4jHome' = $Neo4jServer.Home;
+    }
+    # Cast the types back to String or String[]
+    if ($Value.Count -eq 1)
+    {
+      $properties.Value = $Value[0]
+    }
+    else
+    {
+      $properties.Value = $Value
     }
     Write-Output (New-Object -TypeName PSCustomObject -Property $properties)
   }

@@ -4,9 +4,6 @@ Function Get-KeyValuePairsFromConfFile
   param (
     [Parameter(Mandatory=$true,ValueFromPipeline=$false)]
     [string]$Filename
-    
-    #,[Parameter(Mandatory=$false,ValueFromPipeline=$false)]
-    #[string]$Filter = ''
   )
 
  Process
@@ -21,7 +18,17 @@ Function Get-KeyValuePairsFromConfFile
       if ($matches -ne $null) { $matches.Clear() }
       if ($line -match '^([^=]+)=(.+)$')
       {
-        $properties."$($matches[1].Trim())" = $matches[2].Trim()
+        $keyName = $matches[1].Trim()
+        if ($properties.Contains($keyName))
+        {
+          # There is already a property with this name so it must by a collection of properties.  Turn the value into an array and add it
+          if (($properties."$keyName").GetType().ToString() -eq 'System.String') { $properties."$keyName" = [string[]]@($properties."$keyName") }
+          $properties."$keyName" = $properties."$keyName" + $matches[2].Trim()
+        }
+        else
+        {
+          $properties."$keyName" = $matches[2].Trim()
+        }        
       }
     }
     Write-Output $properties

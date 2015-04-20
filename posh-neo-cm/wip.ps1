@@ -10,7 +10,12 @@ Write-Host "---" -ForegroundColor Yellow
 
 #Set-Neo4jSetting -Setting 'invalid-setting' -ConfigurationFile 'invalid-configurationfile' -Neo4jHome 'TestDrive:\some-dir-that-doesnt-exist' -value 'xxx'
 
-Get-Neo4jServer "C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jSettings | Sort-Object ConfigurationFile,Name | ft
+# Get-Neo4jServer "C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jSettings | `
+#    ? { (-not $_.IsDefault) -and ($_.ConfigurationFile -eq 'neo4j-wrapper.conf') -and ($_.Name -eq 'wrapper.java.additional') } | `
+#    Set-Neo4jSetting | Sort-Object ConfigurationFile,Name | fl
+
+set-Neo4jSetting -Neo4jHome "C:\tools\neo4j-community\neo4j-community-2.2.0" -Name "wrapper.java.additional" -ConfigurationFile 'neo4j-wrapper.conf' -Value @('Hello','Hello2','-Dorg.neo4j.server.properties=conf/neo4j-server.properties') -WhatIf
+
 
 #Get-Neo4jSettings -Home "C:\tools\neo4j-community\neo4j-community-2.2.0"
 

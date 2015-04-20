@@ -112,7 +112,7 @@ Describe "Set-Neo4jSetting" {
     }
   }
 
-  Context "Valid configuration file - new setting" {
+  Context "Valid configuration file - new single setting" {
     Mock Get-Neo4jServer { return $serverObject = New-Object -TypeName PSCustomObject -Property @{ 'Home' = Get-MockNeo4jInstall; 'ServerVersion' = '99.99'; 'ServerType' = 'Community';} }    
     New-MockNeo4jInstall
     
@@ -140,7 +140,38 @@ Describe "Set-Neo4jSetting" {
     }
   }
 
-  Context "Valid configuration file - modify existing setting" {
+  Context "Valid configuration file - new multiple setting" {
+    Mock Get-Neo4jServer { return $serverObject = New-Object -TypeName PSCustomObject -Property @{ 'Home' = Get-MockNeo4jInstall; 'ServerVersion' = '99.99'; 'ServerType' = 'Community';} }    
+    New-MockNeo4jInstall
+    
+    $setting = New-Object -TypeName PSCustomObject -Property @{ 'Neo4jHome' = Get-MockNeo4jInstall; 'ConfigurationFile' = 'neo4j.properties'; 'Name' = 'newsetting'; 'Value' = @('newvalue','newvalue2'); 'IsDefault' = $false }
+    $settingsFile = Join-Path -Path ($setting.Neo4jHome) -ChildPath "conf\$($setting.ConfigurationFile)"
+    $result = ($setting | Set-Neo4jSetting -Confirm:$false)
+
+    It "returns the name" {
+      ($result.Name -eq $setting.Name) | Should Be $true
+    }
+    It "returns the configuration file" {
+      ($result.ConfigurationFile -eq $setting.ConfigurationFile) | Should Be $true
+    }
+    It "returns the Neo4jHome" {
+      ($result.Neo4jHome -eq $setting.Neo4jHome) | Should Be $true
+    }    
+    It "returns a string array" {
+      $result.Value.GetType().ToString() | Should Be "System.String[]"
+    }
+    It "returns the new value" {
+      Compare-ArrayContents ($result.Value) ($setting.Value) | Should Be 0
+    }
+    It "returns non-default value" {
+      $result.IsDefault | Should Be $false
+    }
+    It "added the value to the file" {
+      (Get-Content $settingsFile | % { if ( ($_ -eq 'newsetting=newvalue') -or ($_ -eq 'newsetting=newvalue2') ) { Write-Output $_ } } | Measure-Object).Count | Should Be 2
+    }
+  }
+
+  Context "Valid configuration file - modify existing single setting" {
     Mock Get-Neo4jServer { return $serverObject = New-Object -TypeName PSCustomObject -Property @{ 'Home' = Get-MockNeo4jInstall; 'ServerVersion' = '99.99'; 'ServerType' = 'Community';} }    
     New-MockNeo4jInstall
     
@@ -165,6 +196,37 @@ Describe "Set-Neo4jSetting" {
     }
     It "modified the value in the file" {
       { Get-Content $settingsFile | % { if ($_ -match 'setting1=newvalue') { throw "Setting was added" } } } | Should Throw
+    }
+  }
+
+  Context "Valid configuration file - modify existing multiple setting" {
+    Mock Get-Neo4jServer { return $serverObject = New-Object -TypeName PSCustomObject -Property @{ 'Home' = Get-MockNeo4jInstall; 'ServerVersion' = '99.99'; 'ServerType' = 'Community';} }    
+    New-MockNeo4jInstall
+    
+    $setting = New-Object -TypeName PSCustomObject -Property @{ 'Neo4jHome' = Get-MockNeo4jInstall; 'ConfigurationFile' = 'neo4j.properties'; 'Name' = 'setting1'; 'Value' = @('newvalue','newvalue2'); 'IsDefault' = $false }
+    $settingsFile = Join-Path -Path ($setting.Neo4jHome) -ChildPath "conf\$($setting.ConfigurationFile)"
+    $result = ($setting | Set-Neo4jSetting -Confirm:$false)
+    
+    It "returns the name" {
+      ($result.Name -eq $setting.Name) | Should Be $true
+    }
+    It "returns the configuration file" {
+      ($result.ConfigurationFile -eq $setting.ConfigurationFile) | Should Be $true
+    }
+    It "returns the Neo4jHome" {
+      ($result.Neo4jHome -eq $setting.Neo4jHome) | Should Be $true
+    }
+    It "returns a string array" {
+      $result.Value.GetType().ToString() | Should Be "System.String[]"
+    }
+    It "returns the new value" {
+      Compare-ArrayContents ($result.Value) ($setting.Value) | Should Be 0
+    }
+    It "returns non-default value" {
+      $result.IsDefault | Should Be $false
+    }
+    It "added the value to the file" {
+      (Get-Content $settingsFile | % { if ( ($_ -eq 'setting1=newvalue') -or ($_ -eq 'setting1=newvalue2') ) { Write-Output $_ } } | Measure-Object).Count | Should Be 2
     }
   }
 

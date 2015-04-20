@@ -41,3 +41,11 @@ Function Clear-Neo4jEnvVar() {
 
 Function Restore-Neo4jEnvVar() {
 }
+
+Function Compare-ArrayContents($arrayA, $arrayB)
+{
+  $errorCount = 0
+  $arrayA | ? { -not ($arrayB -contains $_) } | % { $errorCount++ }
+  $arrayB | ? { -not ($arrayA -contains $_) } | % { $errorCount++ }
+  return $errorCount
+}

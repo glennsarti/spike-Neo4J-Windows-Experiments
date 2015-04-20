@@ -65,7 +65,7 @@ Get-Neo4jSetting | Remove-Neo4jSetting -Confirm:$false
 
 **ISSUES**
 
-Doesnt' handle keys with the same name e.g. `wrapper.java.additional` in `neo4j-wrapper.conf`.  Need to figure out a way around it.
+(Fixed) Doesn't handle keys with the same name e.g. `wrapper.java.additional` in `neo4j-wrapper.conf`.  Need to figure out a way around it.
 
 
 

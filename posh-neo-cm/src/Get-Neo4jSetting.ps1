@@ -1,4 +1,4 @@
-Function Get-Neo4jSettings
+Function Get-Neo4jSetting
 {
   [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Low',DefaultParameterSetName='ByDefault')]
   param (
@@ -51,7 +51,7 @@ Function Get-Neo4jSettings
       $filePath = Join-Path -Path $Neo4jServer.Home -ChildPath "conf\$filename"
       if (Test-Path -Path $filePath)
       {
-        $keyPairsFromFile = Get-KeyValuePairsFromConfFile -filename $filePath
+        $keyPairsFromFile = Get-KeyValuePairsFromConfFile -filename $filePath        
       }
       else
       {

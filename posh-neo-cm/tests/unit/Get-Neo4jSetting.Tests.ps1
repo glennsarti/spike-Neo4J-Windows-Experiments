@@ -9,11 +9,11 @@ function Get-Neo4jServer() { throw "Not Implemented1" }
 function Validate-Neo4jServerObject() { throw "Not Implemented2" }
 function Get-KeyValuePairsFromConfFile() { Write-Host $args[1]; throw "Not Implemented3" }
 
-Describe "Get-Neo4jSettings" {
+Describe "Get-Neo4jSetting" {
 
   Context "Invalid or missing default neo4j installation" {
     Mock Get-Neo4jServer { return $null }
-    $result = Get-Neo4jSettings
+    $result = Get-Neo4jSetting
 
     It "return null if missing default" {
       $result | Should BeNullOrEmpty      
@@ -25,7 +25,7 @@ Describe "Get-Neo4jSettings" {
 
   Context "Invalid or missing specified neo4j installation" {
     Mock Get-Neo4jServer { return $null } -ParameterFilter { $Neo4jHome -eq 'TestDrive:\some-dir-that-doesnt-exist' }
-    $result = Get-Neo4jSettings -Neo4jHome 'TestDrive:\some-dir-that-doesnt-exist'
+    $result = Get-Neo4jSetting -Neo4jHome 'TestDrive:\some-dir-that-doesnt-exist'
 
     It "return null if invalid directory" {
       $result | Should BeNullOrEmpty      
@@ -39,7 +39,7 @@ Describe "Get-Neo4jSettings" {
     Mock Validate-Neo4jServerObject { return $null }
     
     It "throws error for an invalid server object" {
-      { Get-Neo4jSettings -Neo4jServer (New-Object -TypeName PSCustomObject) -ErrorAction Stop } | Should Throw
+      { Get-Neo4jSetting -Neo4jServer (New-Object -TypeName PSCustomObject) -ErrorAction Stop } | Should Throw
     }
 
     It "calls Validate-Neo4jServerObject" {
@@ -56,7 +56,7 @@ Describe "Get-Neo4jSettings" {
     Mock Get-KeyValuePairsFromConfFile { return @{ "setting2"="value2"; } } -ParameterFilter { $Filename.EndsWith('neo4j-server.properties') }
     Mock Get-KeyValuePairsFromConfFile { throw 'missing file' }             -ParameterFilter { $Filename.EndsWith('neo4j-wrapper.conf') }
     
-    $result = Get-Neo4jSettings
+    $result = Get-Neo4jSetting
     
     It "ignore the missing file" {
       $result.Count | Should Be 2
@@ -70,7 +70,7 @@ Describe "Get-Neo4jSettings" {
     Mock Get-KeyValuePairsFromConfFile { return @{ "setting2"="value2"; } } -ParameterFilter { $Filename.EndsWith('neo4j-server.properties') }
     Mock Get-KeyValuePairsFromConfFile { return @{ "setting3"="value3"; } } -ParameterFilter { $Filename.EndsWith('neo4j-wrapper.conf') }
     
-    $result = Get-Neo4jSettings
+    $result = Get-Neo4jSetting
     
     It "one setting per file" {
       $result.Count | Should Be 3
@@ -105,4 +105,45 @@ Describe "Get-Neo4jSettings" {
       $unknownSetting | Should Be $false
     } 
   }
+
+  Context "Configuration settings with multiple values" {
+    Mock Get-Neo4jServer { return New-Object -TypeName PSCustomObject -Property (@{'Home' = 'TestDrive:\FakeDir'; 'ServerVersion' = '99.99'; 'ServerType' = 'Community'; }) }  
+    Mock Test-Path { return $true }
+    Mock Get-KeyValuePairsFromConfFile { return @{ "setting1"="value1"; } } -ParameterFilter { $Filename.EndsWith('neo4j.properties') }
+    Mock Get-KeyValuePairsFromConfFile { return @{ "setting2"=@("value2","value3","value4"); } } -ParameterFilter { $Filename.EndsWith('neo4j-server.properties') }
+    Mock Get-KeyValuePairsFromConfFile { return @{} } -ParameterFilter { $Filename.EndsWith('neo4j-wrapper.conf') }
+    
+    $result = Get-Neo4jSetting
+    
+    It "one setting per file" {
+      $result.Count | Should Be 2
+    } 
+
+    # Parse the results and make sure the expected results are there
+    $singleSetting = $null
+    $multiSetting = $null
+    $result | ForEach-Object -Process {
+      $setting = $_
+      switch ($setting.Name) {
+        'setting1' { $singleSetting = $setting }
+        'setting2' { $multiSetting = $setting }
+      }
+    }
+    
+    It "returns single settings" {
+      ($singleSetting -ne $null) | Should Be $true
+    }
+    It "returns multiple settings" {
+      ($multiSetting -ne $null) | Should Be $true
+    }
+    It "returns a string for single settings" {
+      $singleSetting.Value.GetType().ToString() | Should Be "System.String"
+    }
+    It "returns an object array for multiple settings" {
+      $multiSetting.Value.GetType().ToString() | Should Be "System.Object[]"
+    }
+    It "returns an object array for multiple settings with the correct size" {
+      $multiSetting.Value.Count | Should Be 3
+    }
+  }  
 }
