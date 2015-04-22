@@ -20,7 +20,7 @@
 
     <setting file="neo4j-server.properties" name="org.neo4j.server.database.location">data/graph.db</setting>
     <setting file="neo4j-server.properties" name="org.neo4j.server.db.tuning.properties">conf/neo4j.properties</setting>
-    <setting file="neo4j-server.properties" name="org.neo4j.server.webserver.address">127.0.01</setting>
+    <setting file="neo4j-server.properties" name="org.neo4j.server.webserver.address">127.0.0.1</setting>
     <setting file="neo4j-server.properties" name="dbms.security.auth_enabled">true</setting>
     <setting file="neo4j-server.properties" name="org.neo4j.server.webserver.port">7474</setting>
     <setting file="neo4j-server.properties" name="org.neo4j.server.webserver.https.enabled">true</setting>

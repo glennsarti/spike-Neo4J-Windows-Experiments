@@ -48,10 +48,6 @@ Get-Neo4jSetting | Remove-Neo4jSetting -Confirm:$false
 
 ## Stuff to do
 
-* Add filtering to the Get-Neo4jSetting cmdlet?
-
-* Add in default settings per Neo4j version and type (XML files?)
-
 * Add in pre-canned cmdlet to do a basic Neo4j Server setup e.g. Set Http and https port, enable/disable https, set memory, enable GC logging
 
 * Add in pre-canned query to enable and disable clustering (I need to setup clustering first to try this)
@@ -62,6 +58,13 @@ Get-Neo4jSetting | Remove-Neo4jSetting -Confirm:$false
 
 * Start/Stop/Restart Neo4j Server Service?
 
+* Rename all Validate-* verbs to Confirm-*
+
+**DONE**
+
+* (DONE) Add in default settings per Neo4j version and type (XML files?)
+
+* (DONE Not Required) Add filtering to the Get-Neo4jSetting cmdlet?
 
 **ISSUES**
 

@@ -1,5 +1,7 @@
 $ErrorActionPreference = 'Stop'
 
+$VerbosePreference = 'Continue'
+
 Get-Module -Name 'NeoTechnologies.Neo4jForWindows' | Remove-Module
 Import-Module "$PSScriptRoot\src\NeoTechnologies.Neo4jForWindows.psd1" | Out-Null
 
@@ -8,13 +10,18 @@ Import-Module "$PSScriptRoot\src\NeoTechnologies.Neo4jForWindows.psd1" | Out-Nul
 #"C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0","C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jServer
 Write-Host "---" -ForegroundColor Yellow
 
+Get-Neo4jServer "C:\tools\neo4j-community\neo4j-community-2.2.0" | Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -WhatIf
+
+#Get-Neo4jServer "C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jSetting | ConvertTo-Csv > c:\temp\tes.csv
+
+
 #Set-Neo4jSetting -Setting 'invalid-setting' -ConfigurationFile 'invalid-configurationfile' -Neo4jHome 'TestDrive:\some-dir-that-doesnt-exist' -value 'xxx'
 
 # Get-Neo4jServer "C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jSettings | `
 #    ? { (-not $_.IsDefault) -and ($_.ConfigurationFile -eq 'neo4j-wrapper.conf') -and ($_.Name -eq 'wrapper.java.additional') } | `
 #    Set-Neo4jSetting | Sort-Object ConfigurationFile,Name | fl
 
-set-Neo4jSetting -Neo4jHome "C:\tools\neo4j-community\neo4j-community-2.2.0" -Name "wrapper.java.additional" -ConfigurationFile 'neo4j-wrapper.conf' -Value @('Hello','Hello2','-Dorg.neo4j.server.properties=conf/neo4j-server.properties') -WhatIf
+#set-Neo4jSetting -Neo4jHome "C:\tools\neo4j-community\neo4j-community-2.2.0" -Name "wrapper.java.additional" -ConfigurationFile 'neo4j-wrapper.conf' -Value @('Hello','Hello2','-Dorg.neo4j.server.properties=conf/neo4j-server.properties') -WhatIf
 
 
 #Get-Neo4jSettings -Home "C:\tools\neo4j-community\neo4j-community-2.2.0"
