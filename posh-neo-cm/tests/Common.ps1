@@ -1,7 +1,7 @@
 $DebugPreference = "SilentlyContinue"
 
 $here = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$src = Join-Path (Split-Path $here) 'src'
+$src = Join-Path -Path (Join-Path -Path (Split-Path $here) -ChildPath 'src') -ChildPath 'Neo4j-Management'
 
 Function Get-MockNeo4jInstall() {
   return "TestDrive:\Neo4j-home"

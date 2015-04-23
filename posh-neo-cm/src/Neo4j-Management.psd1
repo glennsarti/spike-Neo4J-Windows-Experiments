@@ -59,7 +59,7 @@ PowerShellVersion = '2.0'
 # FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @('NeoTechnologies.Neo4jForWindows.psm1')
+NestedModules = @('Neo4j-Management\Neo4j-Management.psm1')
 
 # Functions to export from this module
 FunctionsToExport = '*' #TODO Debug only @('Func1','Func2')

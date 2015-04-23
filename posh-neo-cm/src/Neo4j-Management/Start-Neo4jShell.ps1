@@ -85,7 +85,7 @@ Function Start-Neo4jShell
     $ShellArgs += @('-host',"$ShellHost")
     $ShellArgs += @('-port',"$Port")
     # Add unbounded command line arguments
-    $ShellArgs += $OtherArgs
+    if ($OtherArgs -ne $null) { $ShellArgs += $OtherArgs }
 
     $result = (Start-Process -FilePath $JavaCMD -ArgumentList $ShellArgs -Wait:$Wait -NoNewWindow:$Wait -PassThru)
     
