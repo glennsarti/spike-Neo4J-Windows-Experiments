@@ -52,15 +52,17 @@ Get-Neo4jSetting | Remove-Neo4jSetting -Confirm:$false
 
 * Add in pre-canned query to enable and disable clustering (I need to setup clustering first to try this)
 
-* Start the Neo4j-Shell (easy enough)
-
 * Start a console version of the Neo4j Server e.g. Start-Neo4jServer -Console
 
 * Start/Stop/Restart Neo4j Server Service?
 
 * Rename all Validate-* verbs to Confirm-*
 
+* Initialize-xxxx commands should optionally passthru the server object instead of the settings
+
 **DONE**
+
+* (DONE) Start the Neo4j-Shell (easy enough)
 
 * (DONE) Add in default settings per Neo4j version and type (XML files?)
 

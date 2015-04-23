@@ -8,6 +8,10 @@ Function Initialize-Neo4jServer
     
     ,[Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByServerObject')]
     [PSCustomObject]$Neo4jServer
+
+# TODO pass through the server object instead of the settings    
+#     ,[Parameter(Mandatory=$false)]
+#     [switch]$PassThru
     
     ,[Parameter(Mandatory=$false)]
     [ValidateRange(0,65535)]
