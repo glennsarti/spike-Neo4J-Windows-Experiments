@@ -37,19 +37,41 @@
 
   <section versionregex="^2\.2\." editionregex="enterprise">
 
+    <setting file="neo4j.properties" name="branched_data_policy">keep_all</setting>
+    <setting file="neo4j.properties" name="ha.com_chunk_size">2M</setting>
+    <setting file="neo4j.properties" name="ha.lock_read_timeout">20s</setting>
+    <setting file="neo4j.properties" name="ha.max_concurrent_channels_per_slave">20</setting>
+    <setting file="neo4j.properties" name="ha.pull_interval">0s</setting>
+    <setting file="neo4j.properties" name="ha.read_timeout">20s</setting>
+    <setting file="neo4j.properties" name="ha.server">0.0.0.0:6001-6011</setting>
+    <setting file="neo4j.properties" name="ha.slave_only">false</setting>
+    <setting file="neo4j.properties" name="ha.state_switch_timeout">120s</setting>
+    <setting file="neo4j.properties" name="ha.tx_push_factor">1</setting>
+    <setting file="neo4j.properties" name="ha.tx_push_strategy">fixed</setting>
+    <setting file="neo4j.properties" name="heartbeat_timeout">11s</setting>
+
     <setting file="neo4j.properties" name="online_backup_enabled">false</setting>
     <setting file="neo4j.properties" name="online_backup_server">127.0.0.1:6362</setting>
-    <setting file="neo4j.properties" name="ha.server_id"></setting>
-    <setting file="neo4j.properties" name="ha.initial_hosts"></setting>
-    <setting file="neo4j.properties" name="ha.cluster_server"></setting>
-    <setting file="neo4j.properties" name="ha.server"></setting>
-    <setting file="neo4j.properties" name="ha.pull_interval"></setting>
-    <setting file="neo4j.properties" name="ha.tx_push_factor"></setting>
-    <setting file="neo4j.properties" name="ha.tx_push_strategy">fixed</setting>
-    <setting file="neo4j.properties" name="branched_data_policy">keep_all</setting>
+
+    <setting file="neo4j.properties" name="ha.allow_init_cluster">true</setting>
+    <setting file="neo4j.properties" name="ha.broadcast_timeout">30s</setting>
+    <setting file="neo4j.properties" name="ha.cluster_name">neo4j.ha</setting>
+    <setting file="neo4j.properties" name="ha.cluster_server">0.0.0.0:5001-5099</setting>
+    <setting file="neo4j.properties" name="ha.configuration_timeout">1s</setting>
     <setting file="neo4j.properties" name="ha.default_timeout">5s</setting>
+    <setting file="neo4j.properties" name="ha.election_timeout">5s</setting>
     <setting file="neo4j.properties" name="ha.heartbeat_interval">5s</setting>
-    <setting file="neo4j.properties" name="heartbeat_timeout">11s</setting>
+    <setting file="neo4j.properties" name="ha.heartbeat_timeout">11s</setting>
+    <setting file="neo4j.properties" name="ha.initial_hosts"></setting>
+    <setting file="neo4j.properties" name="ha.join_timeout">5s</setting>
+    <setting file="neo4j.properties" name="ha.learn_timeout">5s</setting>
+    <setting file="neo4j.properties" name="ha.leave_timeout">30s</setting>
+    <setting file="neo4j.properties" name="ha.paxos_timeout">5s</setting>
+    <setting file="neo4j.properties" name="ha.phase1_timeout">5s</setting>
+    <setting file="neo4j.properties" name="ha.phase2_timeout">5s</setting>
+    <setting file="neo4j.properties" name="ha.pull_interval"></setting>
+    <setting file="neo4j.properties" name="ha.server_id"></setting>
+
     
     <setting file="neo4j-server.properties" name="org.neo4j.server.database.mode">SINGLE</setting>    
   </section>

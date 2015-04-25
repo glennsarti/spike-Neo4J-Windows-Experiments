@@ -1,4 +1,4 @@
-Function Initialize-Neo4jServer
+Function Initialize-Neo4jHACluster
 {
   [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='High',DefaultParameterSetName='ByDefault')]
   param (
@@ -8,6 +8,29 @@ Function Initialize-Neo4jServer
     
     ,[Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByServerObject')]
     [PSCustomObject]$Neo4jServer
+
+    ,[Parameter(Mandatory=$false)]
+    [switch]$PassThru
+    
+    ,[Parameter(Mandatory=$true)]
+    [ValidateRange(1,65535)]
+    [int]$ServerID = 0
+
+    ,[Parameter(Mandatory=$true)]
+    [ValidateScript({$_ -match '^[\d\-:.]+$'})]  
+    [string]$InitialHosts = ''
+
+    ,[Parameter(Mandatory=$false)]
+    [ValidateScript({$_ -match '^[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}:([\d]+|[\d]+-[\d]+)$'})]  
+    [string]$ClusterServer = ''
+
+    ,[Parameter(Mandatory=$false)]
+    [ValidateScript({$_ -match '^[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}:([\d]+|[\d]+-[\d]+)$'})]  
+    [string]$HAServer = ''
+    
+    ,[Parameter(Mandatory=$false)]
+    [switch]$DisallowClusterInit
+    
   )
   
   Begin
@@ -42,18 +65,24 @@ Function Initialize-Neo4jServer
         return
       }
     }
-    Throw "Not implemented yet"
-# 
-#     $defaultSettings = @"
-# "ConfigurationFile","IsDefault","Name","Value","Neo4jHome"
-# "neo4j-server.properties","False","org.neo4j.server.webserver.port","$($HTTPPort)",""
-# "neo4j-server.properties","False","dbms.security.auth_enabled","$((-not $DisableAuthentication).ToString().ToLower())",""
-# "neo4j-server.properties","False","org.neo4j.server.webserver.https.enabled","$($EnableHTTPS.ToString().ToLower())",""
-# "neo4j-server.properties","False","org.neo4j.server.webserver.https.port","$($HTTPSPort)",""
-# "neo4j.properties","False","remote_shell_enabled","$($EnableRemoteShell.ToString().ToLower())",""
-# "neo4j.properties","False","remote_shell_port","$($RemoteShellPort)",""
-# "neo4j-server.properties","False","org.neo4j.server.webserver.address","$($ListenOnIPAddress)",""
-# "@ | ConvertFrom-CSV | ForEach-Object -Process { $_.Neo4jHome = $Neo4jServer.Home; Write-Output $_ } | Set-Neo4jSetting
+    
+    if ($Neo4jServer.ServerType -ne 'Enterprise')
+    {
+      Throw "Neo4j Server type $($Neo4jServer.ServerType) does not support HA"
+      return $null
+    }
+
+    $settings = @"
+"ConfigurationFile","IsDefault","Name","Value","Neo4jHome"
+"neo4j-server.properties","False","org.neo4j.server.database.mode","HA",""
+"neo4j.properties","False","ha.server_id","$ServerID",""
+"neo4j.properties","False","initial_hosts","$InitialHosts",""
+"neo4j.properties","False","ha.cluster_server","$ClusterServer",""
+"neo4j.properties","False","ha.server","$HAServer",""
+"neo4j.properties","False","ha.allow_init_cluster","$(-not $DisallowClusterInit)",""
+"@ | ConvertFrom-CSV | ForEach-Object -Process { $_.Neo4jHome = $Neo4jServer.Home; if ($_.Value -ne '') { Write-Output $_} } | Set-Neo4jSetting
+
+    if ($PassThru) { Write-Output $Neo4jServer } else { Write-Output $settings }
   }
   
   End

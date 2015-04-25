@@ -9,9 +9,8 @@ Function Initialize-Neo4jServer
     ,[Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByServerObject')]
     [PSCustomObject]$Neo4jServer
 
-# TODO pass through the server object instead of the settings    
-#     ,[Parameter(Mandatory=$false)]
-#     [switch]$PassThru
+    ,[Parameter(Mandatory=$false)]
+    [switch]$PassThru
     
     ,[Parameter(Mandatory=$false)]
     [ValidateRange(0,65535)]
@@ -72,7 +71,7 @@ Function Initialize-Neo4jServer
       }
     }
 
-    @"
+    $settings = @"
 "ConfigurationFile","IsDefault","Name","Value","Neo4jHome"
 "neo4j-server.properties","False","org.neo4j.server.webserver.port","$($HTTPPort)",""
 "neo4j-server.properties","False","dbms.security.auth_enabled","$((-not $DisableAuthentication).ToString().ToLower())",""
@@ -82,6 +81,8 @@ Function Initialize-Neo4jServer
 "neo4j.properties","False","remote_shell_port","$($RemoteShellPort)",""
 "neo4j-server.properties","False","org.neo4j.server.webserver.address","$($ListenOnIPAddress)",""
 "@ | ConvertFrom-CSV | ForEach-Object -Process { $_.Neo4jHome = $Neo4jServer.Home; Write-Output $_ } | Set-Neo4jSetting
+
+    if ($PassThru) { Write-Output $Neo4jServer } else { Write-Output $settings }
   }
   
   End

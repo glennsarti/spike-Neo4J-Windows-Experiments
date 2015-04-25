@@ -1,5 +1,8 @@
 $ErrorActionPreference = 'Stop'
 
+# Approved Verb List
+#https://msdn.microsoft.com/en-us/library/ms714428%28v=vs.85%29.aspx
+
 $VerbosePreference = 'Continue'
 
 Get-Module -Name 'Neo4j-Management' | Remove-Module
@@ -10,7 +13,15 @@ Import-Module "$PSScriptRoot\src\Neo4j-Management.psd1" | Out-Null
 #"C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0","C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jServer
 Write-Host "---" -ForegroundColor Yellow
 
-Get-Neo4jServer "C:\tools\neo4j-community\neo4j-community-2.2.0" | Start-Neo4jShell -Wait
+Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | `
+  Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -HTTPPort 7474 -PassThru | `
+  Initialize-Neo4jHACluster -ServerID 1 -InitialHosts '127.0.0.1:5001' -ClusterServer '127.0.0.1:5001' -HAServer '127.0.0.1:6001' -PassThru| `
+  Install-Neo4jService -Name 'neo4j-server1' -Description 'Neo4j HA Server #1' -PassThru | `
+  Start-Neo4jService
+  # Get-Neo4jServer "C:\tools\neo4j-enterprise2\neo4j-enterprise-2.2.0" | `
+#   Initialize-Neo4jHACluster -ServerID 2 -InitialHosts '127.0.0.1:5001' -ClusterServer '127.0.0.1:5002' -HAServer '127.0.0.1:6002' -DisallowClusterInit
+# Get-Neo4jServer "C:\tools\neo4j-enterprise3\neo4j-enterprise-2.2.0" | `
+#   Initialize-Neo4jHACluster -ServerID 3 -InitialHosts '127.0.0.1:5001' -ClusterServer '127.0.0.1:5003' -HAServer '127.0.0.1:6003' -DisallowClusterInit
 
 #Get-Neo4jServer "C:\tools\neo4j-community\neo4j-community-2.2.0" | Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -WhatIf
 
