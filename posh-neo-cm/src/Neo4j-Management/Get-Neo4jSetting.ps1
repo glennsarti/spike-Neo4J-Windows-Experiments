@@ -1,13 +1,9 @@
 Function Get-Neo4jSetting
 {
-  [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Low',DefaultParameterSetName='ByDefault')]
+  [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Low')]
   param (
-    [Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByHome')]
-    [alias('Home')]
-    [string]$Neo4jHome
-    
-    ,[Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByServerObject')]
-    [PSCustomObject]$Neo4jServer
+    [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
+    [object]$Neo4jServer = ''
   )
   
   Begin
@@ -16,39 +12,32 @@ Function Get-Neo4jSetting
 
   Process
   {
-    switch ($PsCmdlet.ParameterSetName)
+    # Get the Neo4j Server information
+    if ($Neo4jServer -eq $null) { $Neo4jServer = '' }
+    switch ($Neo4jServer.GetType().ToString())
     {
-      "ByDefault"
+      'System.Management.Automation.PSCustomObject'
       {
-        $Neo4jServer = Get-Neo4jServer
-        if ($Neo4jServer -eq $null) { return }
-      }
-      "ByHome"
-      {
-        $Neo4jServer = Get-Neo4jServer -Neo4jHome $Neo4jHome
-        if ($Neo4jServer -eq $null) { return }
-      }
-      "ByServerObject"
-      {
-        if (-not (Validate-Neo4jServerObject -Neo4jServer $Neo4jServer))
+        if (-not (Confirm-Neo4jServerObject -Neo4jServer $Neo4jServer))
         {
           Write-Error "The specified Neo4j Server object is not valid"
           return
         }
-      }
+        $thisServer = $Neo4jServer
+      }      
       default
       {
-        Write-Error "Unknown Parameterset $($PsCmdlet.ParameterSetName)"
-        return
+        $thisServer = Get-Neo4jServer -Neo4jHome $Neo4jServer
       }
-    } 
+    }
+    if ($thisServer -eq $null) { return }
    
-     $ConfiguredSettings = ""
+    $ConfiguredSettings = ""
    
     'neo4j.properties','neo4j-server.properties','neo4j-wrapper.conf' | ForEach-Object -Process `
     {
       $filename = $_
-      $filePath = Join-Path -Path $Neo4jServer.Home -ChildPath "conf\$filename"
+      $filePath = Join-Path -Path $thisServer.Home -ChildPath "conf\$filename"
       if (Test-Path -Path $filePath)
       {
         $keyPairsFromFile = Get-KeyValuePairsFromConfFile -filename $filePath        
@@ -67,7 +56,7 @@ Function Get-Neo4jSetting
             'Value' = $_.Value;
             'ConfigurationFile' = $filename;
             'IsDefault' = $false;
-            'Neo4jHome' = $Neo4jServer.Home;
+            'Neo4jHome' = $thisServer.Home;
           }
           Write-Output (New-Object -TypeName PSCustomObject -Property $properties)
           $ConfiguredSettings = $ConfiguredSettings + "|$($filename);$($_.Name)"
@@ -86,11 +75,11 @@ Function Get-Neo4jSetting
         $processSection = $true
         if ( ($node.versionregex -ne $null) -and ($processSection) )
         {
-          $processSection = ( $Neo4jServer.ServerVersion -match ([string]$node.versionregex) )
+          $processSection = ( $thisServer.ServerVersion -match ([string]$node.versionregex) )
         }
         if ( ($node.editionregex -ne $null) -and ($processSection) )
         {
-          $processSection = ( $Neo4jServer.ServerType -match ([string]$node.editionregex) )
+          $processSection = ( $thisServer.ServerType -match ([string]$node.editionregex) )
         }
         
         if ( $processSection )
@@ -102,7 +91,7 @@ Function Get-Neo4jSetting
               'Value' = $_."#text";
               'ConfigurationFile' = $_.file;
               'IsDefault' = $true;
-              'Neo4jHome' = $Neo4jServer.Home;
+              'Neo4jHome' = $thisServer.Home;
             }
             # Only emit the default value if it was not configured
             $hash = "|$($_.file);$($_.name)"

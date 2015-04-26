@@ -21,7 +21,7 @@ Function Get-Neo4jServer
       Write-Error "Could not detect the Neo4j Home directory"
       return
     }
-    if (-not (Validate-Neo4jHome -Neo4jHome $Neo4jHome))
+    if (-not (Confirm-Neo4jHome -Neo4jHome $Neo4jHome))
     {
       Write-Error "$Neo4jHome is not a Neo4j Home directory"
       return
@@ -44,7 +44,7 @@ Function Get-Neo4jServer
     }
     
     $serverObject = New-Object -TypeName PSCustomObject -Property $serverProperties
-    if (-not (Validate-Neo4jServerObject -Neo4jServer $serverObject))
+    if (-not (Confirm-Neo4jServerObject -Neo4jServer $serverObject))
     {
       Write-Error "$Neo4jHome does not contain a valid Neo4j installation"
       return

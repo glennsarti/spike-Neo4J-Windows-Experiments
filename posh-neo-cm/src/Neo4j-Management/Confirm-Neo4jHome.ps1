@@ -1,4 +1,4 @@
-Function Validate-Neo4jHome 
+Function Confirm-Neo4jHome 
 {
   [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Low')]
   param (

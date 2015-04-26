@@ -44,6 +44,7 @@ Function Set-Neo4jSetting
 
   Process
   {
+    Throw "Not Implemented" # NEed to change all this to the single parameterset model
     switch ($PsCmdlet.ParameterSetName)
     {
       "ByDefault"
@@ -58,7 +59,7 @@ Function Set-Neo4jSetting
       }
       "ByServerObject"
       {
-        if (-not (Validate-Neo4jServerObject -Neo4jServer $Neo4jServer))
+        if (-not (Confirm-Neo4jServerObject -Neo4jServer $Neo4jServer))
         {
           Write-Error "The specified Neo4j Server object is not valid"
           return

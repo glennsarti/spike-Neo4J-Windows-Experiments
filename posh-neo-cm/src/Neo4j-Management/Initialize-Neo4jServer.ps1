@@ -1,13 +1,9 @@
 Function Initialize-Neo4jServer
 {
-  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='High',DefaultParameterSetName='ByDefault')]
+  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='High')]
   param (
-    [Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByHome')]
-    [alias('Home')]
-    [string]$Neo4jHome
-    
-    ,[Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByServerObject')]
-    [PSCustomObject]$Neo4jServer
+    [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
+    [object]$Neo4jServer = ''
 
     ,[Parameter(Mandatory=$false)]
     [switch]$PassThru
@@ -36,6 +32,16 @@ Function Initialize-Neo4jServer
 
     ,[Parameter(Mandatory=$false)]
     [switch]$DisableAuthentication
+    
+    ,[Parameter(Mandatory=$false)]
+    [switch]$ClearExistingDatabase
+    
+    ,[Parameter(Mandatory=$false)]
+    [switch]$DisableOnlineBackup
+
+    ,[Parameter(Mandatory=$false)]
+    [ValidateScript({$_ -match '^[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}:([\d]+|[\d]+-[\d]+)$'})]  
+    [string]$OnlineBackupServer = ''
   )
   
   Begin
@@ -44,33 +50,32 @@ Function Initialize-Neo4jServer
 
   Process
   {
-    switch ($PsCmdlet.ParameterSetName)
+    # Get the Neo4j Server information
+    if ($Neo4jServer -eq $null) { $Neo4jServer = '' }
+    switch ($Neo4jServer.GetType().ToString())
     {
-      "ByDefault"
+      'System.Management.Automation.PSCustomObject'
       {
-        $Neo4jServer = Get-Neo4jServer
-        if ($Neo4jServer -eq $null) { return }
-      }
-      "ByHome"
-      {
-        $Neo4jServer = Get-Neo4jServer -Neo4jHome $Neo4jHome
-        if ($Neo4jServer -eq $null) { return }
-      }
-      "ByServerObject"
-      {
-        if (-not (Validate-Neo4jServerObject -Neo4jServer $Neo4jServer))
+        if (-not (Confirm-Neo4jServerObject -Neo4jServer $Neo4jServer))
         {
           Write-Error "The specified Neo4j Server object is not valid"
           return
         }
-      }
+        $thisServer = $Neo4jServer
+      }      
       default
       {
-        Write-Error "Unknown Parameterset $($PsCmdlet.ParameterSetName)"
-        return
+        $thisServer = Get-Neo4jServer -Neo4jHome $Neo4jServer
       }
     }
+    if ($thisServer -eq $null) { return }
 
+    if ( ($thisServer.ServerType -ne 'Enterprise') -and ($DisableOnlineBackup -or ($OnlineBackupServer -ne '') ) )
+    {
+      Throw "Neo4j Server type $($thisServer.ServerType) does not support online backup settings"
+      return $null
+    }
+   
     $settings = @"
 "ConfigurationFile","IsDefault","Name","Value","Neo4jHome"
 "neo4j-server.properties","False","org.neo4j.server.webserver.port","$($HTTPPort)",""
@@ -80,9 +85,21 @@ Function Initialize-Neo4jServer
 "neo4j.properties","False","remote_shell_enabled","$($EnableRemoteShell.ToString().ToLower())",""
 "neo4j.properties","False","remote_shell_port","$($RemoteShellPort)",""
 "neo4j-server.properties","False","org.neo4j.server.webserver.address","$($ListenOnIPAddress)",""
-"@ | ConvertFrom-CSV | ForEach-Object -Process { $_.Neo4jHome = $Neo4jServer.Home; Write-Output $_ } | Set-Neo4jSetting
+"neo4j.properties","False","online_backup_enabled","$(-not $DisableOnlineBackup -and ($OnlineBackupServer -ne ''))",""
+"neo4j.properties","False","online_backup_server","$($OnlineBackupServer)",""
+"@ | ConvertFrom-CSV | `
+      ForEach-Object -Process { $_.Neo4jHome = $thisServer.Home; if ($_.Value -ne '') { Write-Output $_} } | `
+      Set-Neo4jSetting | `
+      ForEach-Object -Process { If (-not $PassThru) { Write-Output $_ } }
 
-    if ($PassThru) { Write-Output $Neo4jServer } else { Write-Output $settings }
+    if ($ClearExistingDatabase)
+    {
+      $dbSetting = ($thisServer | Get-Neo4jSetting | ? { (($_.ConfigurationFile -eq 'neo4j-server.properties') -and ($_.Name -eq 'org.neo4j.server.database.location')) })
+      $dbPath = Join-Path -Path $thisServer.Home -ChildPath $dbSetting.Value
+      if (Test-Path -Path $dbPath) { Remove-Item -Path $dbPath -Recurse -Force }
+    }
+
+    if ($PassThru) { Write-Output $thisServer }
   }
   
   End

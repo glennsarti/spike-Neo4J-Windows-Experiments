@@ -1,14 +1,10 @@
 Function Start-Neo4jShell
 {
-  [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Low',DefaultParameterSetName='ByDefault')]
+  [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Low')]
   param (
-    [Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByHome')]
-    [alias('Home')]
-    [string]$Neo4jHome
+    [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
+    [object]$Neo4jServer = ''
     
-    ,[Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByServerObject')]
-    [PSCustomObject]$Neo4jServer
-
     ,[Parameter(Mandatory=$false,ValueFromPipeline=$false)]
     [string]$UseHost = ''
 
@@ -19,6 +15,9 @@ Function Start-Neo4jShell
     
     ,[Parameter(Mandatory=$false)]
     [switch]$Wait
+
+    ,[Parameter(Mandatory=$false)]
+    [switch]$PassThru   
     
     ,[Parameter(ValueFromRemainingArguments = $true)]
     [Object[]]$OtherArgs
@@ -30,37 +29,30 @@ Function Start-Neo4jShell
 
   Process
   {
-    switch ($PsCmdlet.ParameterSetName)
+    # Get the Neo4j Server information
+    if ($Neo4jServer -eq $null) { $Neo4jServer = '' }
+    switch ($Neo4jServer.GetType().ToString())
     {
-      "ByDefault"
+      'System.Management.Automation.PSCustomObject'
       {
-        $Neo4jServer = Get-Neo4jServer
-        if ($Neo4jServer -eq $null) { return }
-      }
-      "ByHome"
-      {
-        $Neo4jServer = Get-Neo4jServer -Neo4jHome $Neo4jHome
-        if ($Neo4jServer -eq $null) { return }
-      }
-      "ByServerObject"
-      {
-        if (-not (Validate-Neo4jServerObject -Neo4jServer $Neo4jServer))
+        if (-not (Confirm-Neo4jServerObject -Neo4jServer $Neo4jServer))
         {
           Write-Error "The specified Neo4j Server object is not valid"
           return
         }
-      }
+        $thisServer = $Neo4jServer
+      }      
       default
       {
-        Write-Error "Unknown Parameterset $($PsCmdlet.ParameterSetName)"
-        return
+        $thisServer = Get-Neo4jServer -Neo4jHome $Neo4jServer
       }
     }
+    if ($thisServer -eq $null) { return }
 
     $ShellRemoteEnabled = $false
     $ShellHost = '127.0.0.1'
     $Port = 1337    
-    Get-Neo4jSetting -Neo4jServer $Neo4jServer | ForEach-Object -Process `
+    Get-Neo4jSetting -Neo4jServer $thisServer | ForEach-Object -Process `
     {
       if (($_.ConfigurationFile -eq 'neo4j.properties') -and ($_.Name -eq 'remote_shell_enabled')) { $ShellRemoteEnabled = ($_.Value.ToUpper() -eq 'TRUE') }
       if (($_.ConfigurationFile -eq 'neo4j.properties') -and ($_.Name -eq 'remote_shell_host')) { $ShellHost = ($_.Value) }
@@ -72,7 +64,7 @@ Function Start-Neo4jShell
     
     
     $JavaCMD = 'java'
-    $RepoPath = Join-Path  -Path $Neo4jServer.Home -ChildPath 'lib'
+    $RepoPath = Join-Path  -Path $thisServer.Home -ChildPath 'lib'
     $ClassPath = ''    
     Get-ChildItem -Path $RepoPath | ? { $_.Extension -eq '.jar'} | % {
       $ClassPath += "`"$($_.FullName)`";"
@@ -89,7 +81,7 @@ Function Start-Neo4jShell
 
     $result = (Start-Process -FilePath $JavaCMD -ArgumentList $ShellArgs -Wait:$Wait -NoNewWindow:$Wait -PassThru)
     
-    Write-Output $Neo4jServer
+    if ($PassThru) { Write-Output $thisServer } else { Write-Output $result }
   }
   
   End

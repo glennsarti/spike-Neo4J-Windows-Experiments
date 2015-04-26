@@ -1,4 +1,4 @@
-Function Validate-Neo4jServerObject
+Function Confirm-Neo4jServerObject
 {
   [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Low')]
   param (

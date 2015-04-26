@@ -4,13 +4,13 @@ $common = Join-Path (Split-Path -Parent $here) 'Common.ps1'
 . $common
 . "$src\$sut"
 
-Describe "Validate-Neo4jServerObject" {
+Describe "Confirm-Neo4jServerObject" {
   Context "Invalid Server Object" {
     It "throw if missing object" {
-      { Validate-Neo4jServerObject } | Should Throw
+      { Confirm-Neo4jServerObject } | Should Throw
     }
     It "return false if missing all properties" {
-      (Validate-Neo4jServerObject -Neo4jServer (New-Object -TypeName PSCustomObject)) | Should be $false
+      (Confirm-Neo4jServerObject -Neo4jServer (New-Object -TypeName PSCustomObject)) | Should be $false
     }
     It "return false if Home is null" {
       $serverObject = New-Object -TypeName PSCustomObject -Property @{
@@ -18,7 +18,7 @@ Describe "Validate-Neo4jServerObject" {
         'ServerVersion' = '99.99';
         'ServerType' = 'Community';
       }
-      (Validate-Neo4jServerObject -Neo4jServer $serverObject) | Should be $false
+      (Confirm-Neo4jServerObject -Neo4jServer $serverObject) | Should be $false
     }
     It "return false if ServerVersion is null" {
       $serverObject = New-Object -TypeName PSCustomObject -Property @{
@@ -26,7 +26,7 @@ Describe "Validate-Neo4jServerObject" {
         'ServerVersion' = $null;
         'ServerType' = 'Community';
       }
-      (Validate-Neo4jServerObject -Neo4jServer $serverObject) | Should be $false
+      (Confirm-Neo4jServerObject -Neo4jServer $serverObject) | Should be $false
     }
     It "return false if ServerType is null" {
       $serverObject = New-Object -TypeName PSCustomObject -Property @{
@@ -34,7 +34,7 @@ Describe "Validate-Neo4jServerObject" {
         'ServerVersion' = '99.99';
         'ServerType' = $null;
       }
-      (Validate-Neo4jServerObject -Neo4jServer $serverObject) | Should be $false
+      (Confirm-Neo4jServerObject -Neo4jServer $serverObject) | Should be $false
     }
     It "return false if ServerType is not Community or Enterprise" {
       $serverObject = New-Object -TypeName PSCustomObject -Property @{
@@ -42,7 +42,7 @@ Describe "Validate-Neo4jServerObject" {
         'ServerVersion' = '99.99';
         'ServerType' = 'SomethingSilly';
       }
-      (Validate-Neo4jServerObject -Neo4jServer $serverObject) | Should be $false
+      (Confirm-Neo4jServerObject -Neo4jServer $serverObject) | Should be $false
     }
     It "return false if Home does not exist" {
       $serverObject = New-Object -TypeName PSCustomObject -Property @{
@@ -50,7 +50,7 @@ Describe "Validate-Neo4jServerObject" {
         'ServerVersion' = '99.99';
         'ServerType' = 'Community';
       }
-      (Validate-Neo4jServerObject -Neo4jServer $serverObject) | Should be $false
+      (Confirm-Neo4jServerObject -Neo4jServer $serverObject) | Should be $false
     }
   }
 
@@ -62,7 +62,7 @@ Describe "Validate-Neo4jServerObject" {
       'ServerVersion' = '99.99';
       'ServerType' = 'Community';
     }
-    $result = Validate-Neo4jServerObject -Neo4jServer $serverObject
+    $result = Confirm-Neo4jServerObject -Neo4jServer $serverObject
 
     It "returns true" {
       $result | Should be $true
