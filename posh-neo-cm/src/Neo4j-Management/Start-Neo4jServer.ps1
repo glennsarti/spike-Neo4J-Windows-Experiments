@@ -44,9 +44,15 @@ Function Start-Neo4jServer
     }
     if ($thisServer -eq $null) { return }
     
+    $JavaCMD = Get-Java -BaseDir $thisServer.Home
+    if ($JavaCMD -eq $null)
+    {
+      Throw "Unable to locate Java"
+      return
+    }
+
     if ($PsCmdlet.ParameterSetName -eq 'Console')
     {    
-      $JavaCMD = 'java'
   
       $ShellArgs = @( `
         "-DworkingDir=`"$($thisServer.Home)`"" `
@@ -56,16 +62,16 @@ Function Start-Neo4jServer
         ,"-DserverMainClass=org.neo4j.server.Bootstrapper" `
         ,"-jar","$($thisServer.Home)\bin\windows-service-wrapper-5.jar"      
       )
-      $result = (Start-Process -FilePath $JavaCMD -ArgumentList $ShellArgs -Wait:$Wait -NoNewWindow:$Wait -PassThru -WorkingDirectory $thisServer.Home )
+      $result = (Start-Process -FilePath $JavaCMD.java -ArgumentList $ShellArgs -Wait:$Wait -NoNewWindow:$Wait -PassThru -WorkingDirectory $thisServer.Home )
       
-      if ($PassThru) { Write-Output $thisServer } else { Write-Output $result }
+      if ($PassThru) { Write-Output $thisServer } else { Write-Output $result.ExitCode }
     }
     
     if ($PsCmdlet.ParameterSetName -eq 'WindowsService')
     {
       # TODO
       Throw 'Not Implemented'
-      return $null
+      return
     }
   }
   

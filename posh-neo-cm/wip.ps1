@@ -13,26 +13,26 @@ Import-Module "$PSScriptRoot\src\Neo4j-Management.psd1" | Out-Null
 #"C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0","C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jServer
 Write-Host "---" -ForegroundColor Yellow
 
-Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | Start-Neo4jShell -PassThru -Wait
+#Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | Start-Neo4jBackup -Wait -to C:\temp\test
 
 
 
-# Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | `
-#   Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -HTTPPort 7474 -PassThru | `
-#   Initialize-Neo4jHACluster -ServerID 1 -InitialHosts '127.0.0.1:5001' -ClusterServer '127.0.0.1:5001' -HAServer '127.0.0.1:6001' -PassThru | `
-#   Start-Neo4jServer -Console
-# 
-# Start-Sleep -Seconds 10
-# 
-# Get-Neo4jServer "C:\tools\neo4j-enterprise2\neo4j-enterprise-2.2.0" | `
-#   Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -HTTPPort 7475 -ClearExistingDatabase -DisableOnlineBackup -PassThru | `
-#   Initialize-Neo4jHACluster -ServerID 2 -InitialHosts '127.0.0.1:5001' -ClusterServer '127.0.0.1:5002' -HAServer '127.0.0.1:6002' -DisallowClusterInit -PassThru | `
-#   Start-Neo4jServer -Console
-# 
-# Get-Neo4jServer "C:\tools\neo4j-enterprise3\neo4j-enterprise-2.2.0" | `
-#   Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -HTTPPort 7476 -ClearExistingDatabase -DisableOnlineBackup -PassThru | `
-#   Initialize-Neo4jHACluster -ServerID 3 -InitialHosts '127.0.0.1:5001' -ClusterServer '127.0.0.1:5003' -HAServer '127.0.0.1:6003' -DisallowClusterInit -PassThru | `
-#   Start-Neo4jServer -Console
+Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | `
+  Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -HTTPPort 7474 -OnlineBackupServer '127.0.0.1:6362' -PassThru | `
+  Initialize-Neo4jHACluster -ServerID 1 -InitialHosts '127.0.0.1:5001' -ClusterServer '127.0.0.1:5001' -HAServer '127.0.0.1:6001' -PassThru | `
+  Start-Neo4jServer -Console
+
+Start-Sleep -Seconds 10
+
+Get-Neo4jServer "C:\tools\neo4j-enterprise2\neo4j-enterprise-2.2.0" | `
+  Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -HTTPPort 7475 -ClearExistingDatabase -OnlineBackupServer '127.0.0.1:6363' -PassThru | `
+  Initialize-Neo4jHACluster -ServerID 2 -InitialHosts '127.0.0.1:5001' -ClusterServer '127.0.0.1:5002' -HAServer '127.0.0.1:6002' -DisallowClusterInit -PassThru | `
+  Start-Neo4jServer -Console
+
+Get-Neo4jServer "C:\tools\neo4j-enterprise3\neo4j-enterprise-2.2.0" | `
+  Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -HTTPPort 7476 -ClearExistingDatabase -OnlineBackupServer '127.0.0.1:6364' -PassThru | `
+  Initialize-Neo4jHACluster -ServerID 3 -InitialHosts '127.0.0.1:5001' -ClusterServer '127.0.0.1:5003' -HAServer '127.0.0.1:6003' -DisallowClusterInit -PassThru | `
+  Start-Neo4jServer -Console
 
 #Get-Neo4jServer "C:\tools\neo4j-community\neo4j-community-2.2.0" | Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -WhatIf
 

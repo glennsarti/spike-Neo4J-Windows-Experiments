@@ -1,32 +1,25 @@
 Function Set-Neo4jSetting
 {
-  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Medium',DefaultParameterSetName='ByDefault')]
+  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Medium')]
   param (
-    [Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByHome')]
-    [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
+    [Parameter(Mandatory=$false,ValueFromPipeline=$true,ParameterSetName='ByServerObject')]
+    [object]$Neo4jServer = ''
+  
+    ,[Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
     [alias('Home')]
     [string]$Neo4jHome
     
-    ,[Parameter(Mandatory=$true,ValueFromPipeline=$true,ParameterSetName='ByServerObject')]
-    [PSCustomObject]$Neo4jServer
-
-    ,[Parameter(Mandatory=$true,ParameterSetName='ByDefault')]
-    [Parameter(Mandatory=$true,ParameterSetName='ByHome')]
-    [Parameter(Mandatory=$true,ParameterSetName='ByServerObject')]
+    ,[Parameter(Mandatory=$true,ParameterSetName='ByServerObject')]
     [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
     [alias('File')]
     [string]$ConfigurationFile
 
-    ,[Parameter(Mandatory=$true,ParameterSetName='ByDefault')]
-    [Parameter(Mandatory=$true,ParameterSetName='ByHome')]
-    [Parameter(Mandatory=$true,ParameterSetName='ByServerObject')]
+    ,[Parameter(Mandatory=$true,ParameterSetName='ByServerObject')]
     [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
     [alias('Setting')]
     [string]$Name
 
-    ,[Parameter(Mandatory=$true,ParameterSetName='ByDefault')]
-    [Parameter(Mandatory=$true,ParameterSetName='ByHome')]
-    [Parameter(Mandatory=$true,ParameterSetName='ByServerObject')]
+    ,[Parameter(Mandatory=$true,ParameterSetName='ByServerObject')]
     [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
     [string[]]$Value
     
@@ -44,31 +37,32 @@ Function Set-Neo4jSetting
 
   Process
   {
-    Throw "Not Implemented" # NEed to change all this to the single parameterset model
     switch ($PsCmdlet.ParameterSetName)
     {
-      "ByDefault"
-      {
-        $Neo4jServer = Get-Neo4jServer
-        if ($Neo4jServer -eq $null) { return }
-      }
-      "ByHome"
-      {
-        $Neo4jServer = Get-Neo4jServer -Neo4jHome $Neo4jHome
-        if ($Neo4jServer -eq $null) { return }
-      }
       "ByServerObject"
       {
-        if (-not (Confirm-Neo4jServerObject -Neo4jServer $Neo4jServer))
+        # Get the Neo4j Server information
+        if ($Neo4jServer -eq $null) { $Neo4jServer = '' }
+        switch ($Neo4jServer.GetType().ToString())
         {
-          Write-Error "The specified Neo4j Server object is not valid"
-          return
+          'System.Management.Automation.PSCustomObject'
+          {
+            if (-not (Confirm-Neo4jServerObject -Neo4jServer $Neo4jServer))
+            {
+              Write-Error "The specified Neo4j Server object is not valid"
+              return
+            }
+            $thisServer = $Neo4jServer
+          }      
+          default
+          {
+            $thisServer = Get-Neo4jServer -Neo4jHome $Neo4jServer
+          }
         }
       }
       "BySettingObject"
       {
-        $Neo4jServer = Get-Neo4jServer -Neo4jHome $Neo4jHome
-        if ($Neo4jServer -eq $null) { return }
+        $thisServer = Get-Neo4jServer -Neo4jHome $Neo4jHome
       }
       default
       {
@@ -76,9 +70,10 @@ Function Set-Neo4jSetting
         return
       }
     }
+    if ($thisServer -eq $null) { return }
     
     # Check if the configuration file exists
-    $filePath = Join-Path -Path $Neo4jServer.Home -ChildPath "conf\$ConfigurationFile"
+    $filePath = Join-Path -Path $thisServer.Home -ChildPath "conf\$ConfigurationFile"
     if ( -not (Test-Path -Path $filePath))
     {
       if ($Force)
@@ -143,7 +138,7 @@ Function Set-Neo4jSetting
       'Value' = $null;
       'ConfigurationFile' = $ConfigurationFile;
       'IsDefault' = $false;
-      'Neo4jHome' = $Neo4jServer.Home;
+      'Neo4jHome' = $thisServer.Home;
     }
     # Cast the types back to String or String[]
     if ($Value.Count -eq 1)

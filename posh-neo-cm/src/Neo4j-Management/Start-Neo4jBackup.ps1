@@ -1,4 +1,4 @@
-Function Start-Neo4jShell
+Function Start-Neo4jBackup
 {
   [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Low')]
   param (
@@ -6,13 +6,17 @@ Function Start-Neo4jShell
     [object]$Neo4jServer = ''
     
     ,[Parameter(Mandatory=$false,ValueFromPipeline=$false)]
+    [Alias('Host')]
     [string]$UseHost = ''
 
     ,[Parameter(Mandatory=$false,ValueFromPipeline=$false)]
-    [Alias('ShellPort')]
+    [Alias('Port')]
     [ValidateRange(0,65535)]
     [int]$UsePort = -1
-    
+
+    ,[Parameter(Mandatory=$true,ValueFromPipeline=$false)]
+    [string]$To = ''
+
     ,[Parameter(Mandatory=$false)]
     [switch]$Wait
 
@@ -49,20 +53,45 @@ Function Start-Neo4jShell
     }
     if ($thisServer -eq $null) { return }
 
-    $ShellRemoteEnabled = $false
-    $ShellHost = '127.0.0.1'
-    $Port = 1337    
+    if ($thisServer.ServerType -ne 'Enterprise')
+    {
+      Throw "Neo4j Server type $($thisServer.ServerType) does not support online backup"
+      return
+    }
+
+    # Get the online backup settings
+    $BackupEnabled = $false
+    $BackupHost = '127.0.0.1:6362'
     Get-Neo4jSetting -Neo4jServer $thisServer | ForEach-Object -Process `
     {
-      if (($_.ConfigurationFile -eq 'neo4j.properties') -and ($_.Name -eq 'remote_shell_enabled')) { $ShellRemoteEnabled = ($_.Value.ToUpper() -eq 'TRUE') }
-      if (($_.ConfigurationFile -eq 'neo4j.properties') -and ($_.Name -eq 'remote_shell_host')) { $ShellHost = ($_.Value) }
-      if (($_.ConfigurationFile -eq 'neo4j.properties') -and ($_.Name -eq 'remote_shell_port')) { $Port = [int]($_.Value) }
+      if (($_.ConfigurationFile -eq 'neo4j.properties') -and ($_.Name -eq 'online_backup_enabled')) { $BackupEnabled = ($_.Value.ToUpper() -eq 'TRUE') }
+      if (($_.ConfigurationFile -eq 'neo4j.properties') -and ($_.Name -eq 'online_backup_server')) { $BackupHost = ($_.Value) }
     }
-    if (!$ShellRemoteEnabled) { $ShellHost = 'localhost' }
-    if ($UseHost -ne '') { $ShellHost = $UseHost }
-    if ($UsePort -ne -1) { $Port = $UsePort }
+    if (($UseHost -ne '') -and ($UserPort -ne -1))
+    {
+      $BackupHost = "$($UseHost):$(UsePort)"
+      $BackupEnabled = $true
+    }
+    if (!$BackupEnabled)
+    {
+      throw "Online Backup Server is not enabled"
+      return
+    }
+    
+    if ($matches -ne $null) { $matches.Clear() }
+    if ($BackupHost -match '^([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}):([\d]+|[\d]+-[\d]+)$')
+    {
+      $serverHost = $matches[1]
+      $serverport = $matches[2]
+    }
+    else
+    {
+      Throw "$BackupHost is an invalid Backup Server address"
+      return
+    }
 
-    $JavaCMD = Get-Java -BaseDir $thisServer.Home -ErrorAction Stop
+    # Get Java
+    $JavaCMD = Get-Java -BaseDir $thisServer.Home -ExtraClassPath (Join-Path -Path $thisServer.Home -ChildPath 'system\coordinator\lib')  -ErrorAction Stop
     if ($JavaCMD -eq $null)
     {
       Throw "Unable to locate Java"
@@ -70,10 +99,11 @@ Function Start-Neo4jShell
     }
     
     $ShellArgs = $JavaCMD.args
-    $ShellArgs += @('-Dapp.name=neo4j-shell')
-    $ShellArgs += @('org.neo4j.shell.StartClient')
-    $ShellArgs += @('-host',"$ShellHost")
-    $ShellArgs += @('-port',"$Port")
+    $ShellArgs += @('-Dapp.name=neo4j-backup')
+    $ShellArgs += @('org.neo4j.backup.BackupTool')
+    $ShellArgs += @('-host',"$serverHost")
+    $ShellArgs += @('-port',"$serverport")
+    $ShellArgs += @('-to',"$To")    
     # Add unbounded command line arguments
     if ($OtherArgs -ne $null) { $ShellArgs += $OtherArgs }
 

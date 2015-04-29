@@ -73,7 +73,7 @@ Function Initialize-Neo4jServer
     if ( ($thisServer.ServerType -ne 'Enterprise') -and ($DisableOnlineBackup -or ($OnlineBackupServer -ne '') ) )
     {
       Throw "Neo4j Server type $($thisServer.ServerType) does not support online backup settings"
-      return $null
+      return
     }
    
     $settings = @"
