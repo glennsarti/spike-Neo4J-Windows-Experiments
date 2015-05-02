@@ -62,6 +62,7 @@ Needs unit tests
 * Install/Start/Stop/Restart/Remove Neo4j Arbiter Cluster instances
 
 * Install/Start/Stop/Restart/Remove Neo4j Server Service?
+Done - Install, Start 
 
 * Rename all Validate-* verbs to Confirm-*
 ** ALL UNIT TESTS ARE BROKEN **

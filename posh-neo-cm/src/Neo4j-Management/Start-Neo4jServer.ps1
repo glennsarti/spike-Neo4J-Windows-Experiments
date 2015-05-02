@@ -1,6 +1,6 @@
 Function Start-Neo4jServer
 {
-  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Low')]
+  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Low',DefaultParameterSetName='WindowsService')]
   param (
     [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
     [object]$Neo4jServer = ''
@@ -14,8 +14,8 @@ Function Start-Neo4jServer
     ,[Parameter(Mandatory=$false)]
     [switch]$PassThru   
     
-    ,[Parameter(Mandatory=$true,ParameterSetName='WindowsService')]
-    [switch]$Service
+    ,[Parameter(Mandatory=$false,ParameterSetName='WindowsService')]
+    [string]$ServiceName = ''
   )
   
   Begin
@@ -69,9 +69,20 @@ Function Start-Neo4jServer
     
     if ($PsCmdlet.ParameterSetName -eq 'WindowsService')
     {
-      # TODO
-      Throw 'Not Implemented'
-      return
+      if ($ServiceName -eq '')
+      {
+        $setting = ($thisServer | Get-Neo4jSetting -ConfigurationFile 'neo4j-wrapper.conf' -Name 'wrapper.name')
+        if ($setting -ne $null) { $ServiceName = $setting.Value }
+      }
+
+      if ($ServiceName -eq '')
+      {
+        Throw "Could not find the Windows Service Name for Neo4j"
+        return
+      }
+
+      $result = Start-Service -Name $ServiceName
+      if ($PassThru) { Write-Output $thisServer } else { Write-Output $result }
     }
   }
   

@@ -4,6 +4,12 @@ Function Get-Neo4jSetting
   param (
     [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
     [object]$Neo4jServer = ''
+
+    ,[Parameter(Mandatory=$false)]
+    [string[]]$ConfigurationFile = ('neo4j.properties','neo4j-server.properties','neo4j-wrapper.conf')
+
+    ,[Parameter(Mandatory=$false)]
+    [string]$Name = ''
   )
   
   Begin
@@ -34,7 +40,7 @@ Function Get-Neo4jSetting
    
     $ConfiguredSettings = ""
    
-    'neo4j.properties','neo4j-server.properties','neo4j-wrapper.conf' | ForEach-Object -Process `
+    $ConfigurationFile | ForEach-Object -Process `
     {
       $filename = $_
       $filePath = Join-Path -Path $thisServer.Home -ChildPath "conf\$filename"
@@ -49,7 +55,7 @@ Function Get-Neo4jSetting
       
       if ($keyPairsFromFile -ne $null)
       {
-        $keyPairsFromFile.GetEnumerator() | ForEach-Object -Process `
+        $keyPairsFromFile.GetEnumerator() | Where-Object { ($Name -eq '') -or ($_.Name -eq $Name) } | ForEach-Object -Process `
         {
           $properties = @{
             'Name' = $_.Name;
@@ -58,6 +64,7 @@ Function Get-Neo4jSetting
             'IsDefault' = $false;
             'Neo4jHome' = $thisServer.Home;
           }
+
           Write-Output (New-Object -TypeName PSCustomObject -Property $properties)
           $ConfiguredSettings = $ConfiguredSettings + "|$($filename);$($_.Name)"
         }
@@ -84,7 +91,7 @@ Function Get-Neo4jSetting
         
         if ( $processSection )
         {
-          $node.selectNodes("setting") | ForEach-Object -Process `
+          $node.selectNodes("setting") | Where-Object { $ConfigurationFile -contains $_.file } | Where-Object { ($Name -eq '') -or ($_.name -eq $Name) } |  ForEach-Object -Process `
           {
             $properties = @{
               'Name' = $_.name;
