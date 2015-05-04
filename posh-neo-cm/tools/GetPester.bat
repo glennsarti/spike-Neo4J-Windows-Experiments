@@ -1,7 +1,7 @@
 @ECHO OFF
 
 ECHO Cloning Pester
-git clone https://github.com/pester/Pester.git "%~dp0..\pester" --depth 1 --branch 3.3.6
+git clone https://github.com/pester/Pester.git "%~dp0..\pester" --depth 1 --branch 3.3.8
 
 
 ECHO Removing the Git directory (Stops it being detected as a submodule)

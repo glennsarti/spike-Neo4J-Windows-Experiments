@@ -75,7 +75,7 @@ Function Initialize-Neo4jServer
       Throw "Neo4j Server type $($thisServer.ServerType) does not support online backup settings"
       return
     }
-   
+     
     $settings = @"
 "ConfigurationFile","IsDefault","Name","Value","Neo4jHome"
 "neo4j-server.properties","False","org.neo4j.server.webserver.port","$($HTTPPort)",""
@@ -89,8 +89,7 @@ Function Initialize-Neo4jServer
 "neo4j.properties","False","online_backup_server","$($OnlineBackupServer)",""
 "@ | ConvertFrom-CSV | `
       ForEach-Object -Process { $_.Neo4jHome = $thisServer.Home; if ($_.Value -ne '') { Write-Output $_} } | `
-      Set-Neo4jSetting | `
-      ForEach-Object -Process { If (-not $PassThru) { Write-Output $_ } }
+      Set-Neo4jSetting
 
     if ($ClearExistingDatabase)
     {
@@ -99,7 +98,7 @@ Function Initialize-Neo4jServer
       if (Test-Path -Path $dbPath) { Remove-Item -Path $dbPath -Recurse -Force }
     }
 
-    if ($PassThru) { Write-Output $thisServer }
+    if ($PassThru) { Write-Output $thisServer } else { Write-Output $settings }
   }
   
   End

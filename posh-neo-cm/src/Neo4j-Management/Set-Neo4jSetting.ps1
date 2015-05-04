@@ -23,10 +23,6 @@ Function Set-Neo4jSetting
     [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
     [string[]]$Value
     
-    # This parameter is used only for parameterset detection
-    ,[Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ParameterSetName='BySettingObject')]
-    [string]$IsDefault
-
     ,[Parameter(Mandatory=$false)]
     [switch]$Force = $false
   )
@@ -71,7 +67,7 @@ Function Set-Neo4jSetting
       }
     }
     if ($thisServer -eq $null) { return }
-    
+
     # Check if the configuration file exists
     $filePath = Join-Path -Path $thisServer.Home -ChildPath "conf\$ConfigurationFile"
     if ( -not (Test-Path -Path $filePath))
@@ -86,7 +82,7 @@ Function Set-Neo4jSetting
         return
       }
     }
-    
+
     # See if the setting is already defined
     $settingChanged = $false
     $valuesSet = @()
