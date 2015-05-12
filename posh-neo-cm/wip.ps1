@@ -64,5 +64,3 @@ Write-Host "---" -ForegroundColor Yellow
 
 #Set-Neo4jSetting -ConfigurationFile 'neo4j.properties' -Name 'node_auto_indexingxx' -Value 'false'
 #Get-Neo4jServer | Set-Neo4jSetting -ConfigurationFile 'neo4j.properties' -Name 'node_auto_indexingxx' -Value 'false'
-alse'
-false'
