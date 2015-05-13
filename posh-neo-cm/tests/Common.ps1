@@ -2,6 +2,7 @@ $DebugPreference = "SilentlyContinue"
 
 $here = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $src = Join-Path -Path (Join-Path -Path (Split-Path $here) -ChildPath 'src') -ChildPath 'Neo4j-Management'
+$testingfunctions = Join-Path (Split-Path -Parent $here) 'TestingFunctions.ps1'
 
 #Function Get-MockNeo4jInstall() {
 #  return "TestDrive:\Neo4j-home"
@@ -41,11 +42,11 @@ $src = Join-Path -Path (Join-Path -Path (Split-Path $here) -ChildPath 'src') -Ch
 
 #Function Restore-Neo4jEnvVar() {
 #}
-
-Function Compare-ArrayContents($arrayA, $arrayB)
-{
-  $errorCount = 0
-  $arrayA | ? { -not ($arrayB -contains $_) } | % { $errorCount++ }
-  $arrayB | ? { -not ($arrayA -contains $_) } | % { $errorCount++ }
-  return $errorCount
-}
+#
+#Function Compare-ArrayContents($arrayA, $arrayB)
+#{
+#  $errorCount = 0
+#  $arrayA | ? { -not ($arrayB -contains $_) } | % { $errorCount++ }
+#  $arrayB | ? { -not ($arrayA -contains $_) } | % { $errorCount++ }
+#  return $errorCount
+#}

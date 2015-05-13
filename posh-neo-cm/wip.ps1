@@ -13,6 +13,9 @@ Import-Module "$PSScriptRoot\src\Neo4j-Management.psd1" | Out-Null
 #"C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0","C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jServer
 Write-Host "---" -ForegroundColor Yellow
 
+
+"C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jServer | Remove-Neo4jSetting -ConfigurationFile 'neo4j.properties' -Name 'node_auto_indexingxx'
+
 #Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | Start-Neo4jBackup -Wait -to C:\temp\test
 
 # Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | `
