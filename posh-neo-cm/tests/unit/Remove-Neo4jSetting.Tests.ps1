@@ -268,45 +268,18 @@ InModuleScope Neo4j-Management {
         Assert-VerifiableMocks
       }
     }
-<#  
 
-  
-  
-    Context "Valid configuration file using the File alias" {
-      Mock Get-Neo4jServer { return $serverObject = New-Object -TypeName PSCustomObject -Property @{ 'Home' = Get-MockNeo4jInstall; 'ServerVersion' = '99.99'; 'ServerType' = 'Community';} }    
-      New-MockNeo4jInstall
-      
-      $setting = New-Object -TypeName PSCustomObject -Property @{ 'Neo4jHome' = Get-MockNeo4jInstall; 'ConfigurationFile' = 'neo4j.properties'; 'Name' = 'setting1'; 'Value' = ''; }
-      $settingsFile = Join-Path -Path ($setting.Neo4jHome) -ChildPath "conf\$($setting.ConfigurationFile)"
-      $result = ($setting | Remove-Neo4jSetting -Neo4jHome ($setting.Neo4jHome) -File ($setting.ConfigurationFile) -Name ($setting.Name) -Confirm:$false)
-      
-      It "returns the name" {
-        ($result.Name -eq $setting.Name) | Should Be $true
-      }
-      It "returns the configuration file" {
-        ($result.ConfigurationFile -eq $setting.ConfigurationFile) | Should Be $true
-      }
-      It "returns the Neo4jHome" {
-        ($result.Neo4jHome -eq $setting.Neo4jHome) | Should Be $true
-      }
-      It "returns null value" {
-        $result.Value | Should BeNullorEmpty
-      }
-      It "returns default value" {
-        $result.IsDefault | Should Be $true
-      }
-      It "removed the value from the file" {
-        (Get-Content $settingsFile | % { if ($_ -match 'setting1=') { throw "Setting was not removed" } } ) | Should BeNullOrEmpty
-      }
-    }
-  
     Context "Valid configuration file using the Setting alias" {
-      Mock Get-Neo4jServer { return $serverObject = New-Object -TypeName PSCustomObject -Property @{ 'Home' = Get-MockNeo4jInstall; 'ServerVersion' = '99.99'; 'ServerType' = 'Community';} }    
-      New-MockNeo4jInstall
+      Mock Get-Neo4jServer { return $serverObject = New-Object -TypeName PSCustomObject -Property @{ 'Home' = 'TestDrive:\Path'; 'ServerVersion' = '99.99'; 'ServerType' = 'Community';} }
+      Mock Test-Path { $true } -ParameterFilter { $Path -eq 'TestDrive:\Path\conf\neo4j.properties'}
+      Mock Get-Content { return 'setting1=value1' } -ParameterFilter { $Path -eq 'TestDrive:\Path\conf\neo4j.properties'}
+      Mock Set-Content { }
+      Mock Set-Content -Verifiable { } -ParameterFilter {
+         ($Path -eq 'TestDrive:\Path\conf\neo4j.properties') -and ($Value -notcontains 'setting1=value1')
+      }   
       
-      $setting = New-Object -TypeName PSCustomObject -Property @{ 'Neo4jHome' = Get-MockNeo4jInstall; 'ConfigurationFile' = 'neo4j.properties'; 'Name' = 'setting1'; 'Value' = ''; }
-      $settingsFile = Join-Path -Path ($setting.Neo4jHome) -ChildPath "conf\$($setting.ConfigurationFile)"
-      $result = ($setting | Remove-Neo4jSetting -Neo4jHome ($setting.Neo4jHome) -ConfigurationFile ($setting.ConfigurationFile) -Setting ($setting.Name) -Confirm:$false)
+      $setting = New-Object -TypeName PSCustomObject -Property @{ 'Neo4jHome' = 'TestDrive:\Path'; 'ConfigurationFile' = 'neo4j.properties'; 'Name' = 'setting1'; 'Value' = 'value1'; }
+      $result = (Remove-Neo4jSetting -Neo4jHome ($setting.Neo4jHome) -ConfigurationFile ($setting.ConfigurationFile) -Setting ($setting.Name) -Confirm:$false)
       
       It "returns the name" {
         ($result.Name -eq $setting.Name) | Should Be $true
@@ -316,7 +289,7 @@ InModuleScope Neo4j-Management {
       }
       It "returns the Neo4jHome" {
         ($result.Neo4jHome -eq $setting.Neo4jHome) | Should Be $true
-      }
+      }     
       It "returns null value" {
         $result.Value | Should BeNullorEmpty
       }
@@ -324,9 +297,8 @@ InModuleScope Neo4j-Management {
         $result.IsDefault | Should Be $true
       }
       It "removed the value from the file" {
-        (Get-Content $settingsFile | % { if ($_ -match 'setting1=') { throw "Setting was not removed" } } ) | Should BeNullOrEmpty
+        Assert-VerifiableMocks
       }
     }
-    #>
   }
 }

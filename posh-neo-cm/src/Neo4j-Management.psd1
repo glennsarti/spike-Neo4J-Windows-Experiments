@@ -80,7 +80,18 @@ PowerShellVersion = '2.0'
 NestedModules = @('Neo4j-Management\Neo4j-Management.psm1')
 
 # Functions to export from this module
-FunctionsToExport = '*' #TODO Debug only @('Func1','Func2')
+FunctionsToExport = @(
+'Get-Neo4jHome'
+'Get-Neo4jServer'
+'Get-Neo4jSetting'
+'Initialize-Neo4jHACluster'
+'Initialize-Neo4jServer'
+'Install-Neo4jService'
+'Remove-Neo4jSetting'
+'Set-Neo4jSetting'
+'Start-Neo4jBackup'
+'Start-Neo4jServer'
+'Start-Neo4jShell')
 
 # Cmdlets to export from this module
 CmdletsToExport = ''

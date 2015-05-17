@@ -20,7 +20,7 @@
 
 Function Set-Neo4jSetting
 {
-  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Medium')]
+  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Medium',DefaultParameterSetName='ByServerObject')]
   param (
     [Parameter(Mandatory=$false,ValueFromPipeline=$true,ParameterSetName='ByServerObject')]
     [object]$Neo4jServer = ''
@@ -106,6 +106,8 @@ Function Set-Neo4jSetting
     # See if the setting is already defined
     $settingChanged = $false
     $valuesSet = @()
+    $valueAsText = ($Value -join "`n") + "`n" # Converting the array to string is required for PS 2.0 compatibility
+
     $newContent = (Get-Content -Path $filePath | ForEach-Object -Process `
     {
       $originalLine = $_
@@ -118,7 +120,7 @@ Function Set-Neo4jSetting
       if ($line -match "^$($Name)=(.+)`$")
       {
         $currentValue = $matches[1]
-        if (-not $Value.Contains($currentValue))
+        if (-not $valueAsText.Contains("$($currentValue)`n"))
         {
           $originalLine = "donotwrite"
           $settingChanged = $true
@@ -130,10 +132,12 @@ Function Set-Neo4jSetting
       }
       if ($originalLine -ne "donotwrite") { Write-Output $originalLine }
     })
+    $valuesSet = ($valuesSet -join '=') + '=' # Converting the array to string is required for PS 2.0 compatibility
+    
     # Check if any values were not written and append if not
     $Value | ForEach-Object -Process `
     {
-      if (-not $valuesSet.Contains($_))
+      if (-not $valuesSet.Contains("$($_)="))
       {
         if ($newContent -eq $null) { $newContent = @() }
         if ($newContent.GetType().ToString() -eq 'System.String') { $newContent = @($newContent) }

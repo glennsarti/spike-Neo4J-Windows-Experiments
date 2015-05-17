@@ -20,7 +20,7 @@
 
 Function Remove-Neo4jSetting
 {
-  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Medium')]
+  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Medium',DefaultParameterSetName='ByServerObject')]
   param (
     [Parameter(Mandatory=$false,ValueFromPipeline=$true,ParameterSetName='ByServerObject')]
     [object]$Neo4jServer = ''

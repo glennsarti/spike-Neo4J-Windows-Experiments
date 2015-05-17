@@ -47,10 +47,11 @@ InModuleScope Neo4j-Management {
     }
     
     Context "Missing configuration file" {
-      Mock Get-Neo4jServer { return New-Object -TypeName PSCustomObject -Property (@{'Home' = 'TestDrive:\FakeDir'; 'ServerVersion' = '99.99'; 'ServerType' = 'Community'; }) }  
-      Mock Test-Path { return $true } -ParameterFilter { $Path.EndsWith('neo4j.properties') }
-      Mock Test-Path { return $true } -ParameterFilter { $Path.EndsWith('neo4j-server.properties') }
-      Mock Test-Path { return $false } -ParameterFilter { $Path.EndsWith('neo4j-wrapper.conf') }
+      Mock Get-Neo4jServer { return New-Object -TypeName PSCustomObject -Property (@{'Home' = 'TestDrive:\FakeDir'; 'ServerVersion' = '99.99'; 'ServerType' = 'Community'; }) }
+      Mock Test-Path { return $false }  
+      Mock Test-Path { return $true } -ParameterFilter { ([string]$Path).EndsWith('neo4j.properties') }
+      Mock Test-Path { return $true } -ParameterFilter { ([string]$Path).EndsWith('neo4j-server.properties') }
+      Mock Test-Path { return $false } -ParameterFilter { ([string]$Path).EndsWith('neo4j-wrapper.conf') }
       Mock Get-KeyValuePairsFromConfFile { return @{ "setting1"="value1"; } } -ParameterFilter { $Filename.EndsWith('neo4j.properties') }
       Mock Get-KeyValuePairsFromConfFile { return @{ "setting2"="value2"; } } -ParameterFilter { $Filename.EndsWith('neo4j-server.properties') }
       Mock Get-KeyValuePairsFromConfFile { throw 'missing file' }             -ParameterFilter { $Filename.EndsWith('neo4j-wrapper.conf') }
