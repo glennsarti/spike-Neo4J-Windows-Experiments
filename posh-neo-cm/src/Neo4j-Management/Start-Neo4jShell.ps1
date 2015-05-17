@@ -89,7 +89,8 @@ Function Start-Neo4jShell
     }
     
     $ShellArgs = $JavaCMD.args
-    $ShellArgs += @('-Dapp.name=neo4j-shell')
+    if ($ShellArgs -eq $null) { $ShellArgs = @() }
+    $ShellArgs += @([string]'-Dapp.name=neo4j-shell')
     $ShellArgs += @('org.neo4j.shell.StartClient')
     $ShellArgs += @('-host',"$ShellHost")
     $ShellArgs += @('-port',"$Port")

@@ -111,8 +111,8 @@ AliasesToExport = ''
 # Private data to pass to the module specified in RootModule/ModuleToProcess
 # PrivateData = ''
 
-# HelpInfo URI of this module
-HelpInfoURI = 'http://neo4j.com/xxxx'
+# HelpInfo URI of this module - Powershell 3.0 and above only
+# HelpInfoURI = 'http://neo4j.com/xxxx'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
