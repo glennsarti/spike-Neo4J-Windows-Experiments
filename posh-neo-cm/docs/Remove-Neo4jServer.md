@@ -1,20 +1,14 @@
-# Start-Neo4jServer
+# Remove-Neo4jServer
 
 
-Start-Neo4jServer [-Neo4jServer <Object>] [-Wait] [-PassThru] [-ServiceName <string>] [-WhatIf] [-Confirm] [<CommonParameters>]
-
-Start-Neo4jServer -Console [-Neo4jServer <Object>] [-Wait] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
+Remove-Neo4jServer [[-Neo4jServer] <Object>] [[-ServiceName] <string>] [-SucceedIfNotExists] [-WhatIf] [-Confirm] [<CommonParameters>]
 
 
 
 ## Syntax
 
 ```powershell
-Start-Neo4jServer [-Neo4jServer <Object>] [-Wait] [-PassThru] [-ServiceName <string>] [-WhatIf] [-Confirm] [<CommonParameters>]
-```
-
-```powershell
-Start-Neo4jServer -Console [-Neo4jServer <Object>] [-Wait] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
+Remove-Neo4jServer [-Neo4jServer <Object>] [-ServiceName <string>] [-SucceedIfNotExists] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 
@@ -31,37 +25,15 @@ Default Value          |
 Accept Pipeline Input? | false
 
  
-###  -Console
-
-Property               | Value
----------------------- | -----
-Aliases                | 
-Required?              | true
-Position?              | Named
-Default Value          | 
-Accept Pipeline Input? | false
-
- 
 ###  -Neo4jServer [\<Object\>]
 
 Property               | Value
 ---------------------- | --------------
 Aliases                | 
 Required?              | false
-Position?              | Named
+Position?              | 0
 Default Value          | 
 Accept Pipeline Input? | true (ByValue)
-
- 
-###  -PassThru
-
-Property               | Value
----------------------- | -----
-Aliases                | 
-Required?              | false
-Position?              | Named
-Default Value          | 
-Accept Pipeline Input? | false
 
  
 ###  -ServiceName [\<string\>]
@@ -70,12 +42,12 @@ Property               | Value
 ---------------------- | -----
 Aliases                | 
 Required?              | false
-Position?              | Named
+Position?              | 1
 Default Value          | 
 Accept Pipeline Input? | false
 
  
-###  -Wait
+###  -SucceedIfNotExists
 
 Property               | Value
 ---------------------- | -----

@@ -1,20 +1,14 @@
-# Start-Neo4jServer
+# Install-Neo4jServer
 
 
-Start-Neo4jServer [-Neo4jServer <Object>] [-Wait] [-PassThru] [-ServiceName <string>] [-WhatIf] [-Confirm] [<CommonParameters>]
-
-Start-Neo4jServer -Console [-Neo4jServer <Object>] [-Wait] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
+Install-Neo4jServer [[-Neo4jServer] <Object>] [[-Name] <string>] [[-DisplayName] <string>] [[-Description] <string>] [[-StartType] <string>] [-SucceedIfAlreadyExists] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 
 
 
 ## Syntax
 
 ```powershell
-Start-Neo4jServer [-Neo4jServer <Object>] [-Wait] [-PassThru] [-ServiceName <string>] [-WhatIf] [-Confirm] [<CommonParameters>]
-```
-
-```powershell
-Start-Neo4jServer -Console [-Neo4jServer <Object>] [-Wait] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
+Install-Neo4jServer [-Neo4jServer <Object>] [-Name <string>] [-DisplayName <string>] [-Description <string>] [-StartType <string> {Manual | Automatic | Disabled}] [-SucceedIfAlreadyExists] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 
@@ -31,13 +25,35 @@ Default Value          |
 Accept Pipeline Input? | false
 
  
-###  -Console
+###  -Description [\<string\>]
 
 Property               | Value
 ---------------------- | -----
 Aliases                | 
-Required?              | true
-Position?              | Named
+Required?              | false
+Position?              | 3
+Default Value          | 
+Accept Pipeline Input? | false
+
+ 
+###  -DisplayName [\<string\>]
+
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 2
+Default Value          | 
+Accept Pipeline Input? | false
+
+ 
+###  -Name [\<string\>]
+
+Property               | Value
+---------------------- | -----
+Aliases                | 
+Required?              | false
+Position?              | 1
 Default Value          | 
 Accept Pipeline Input? | false
 
@@ -48,7 +64,7 @@ Property               | Value
 ---------------------- | --------------
 Aliases                | 
 Required?              | false
-Position?              | Named
+Position?              | 0
 Default Value          | 
 Accept Pipeline Input? | true (ByValue)
 
@@ -64,18 +80,18 @@ Default Value          |
 Accept Pipeline Input? | false
 
  
-###  -ServiceName [\<string\>]
+###  -StartType [\<string\>]
 
 Property               | Value
 ---------------------- | -----
 Aliases                | 
 Required?              | false
-Position?              | Named
+Position?              | 4
 Default Value          | 
 Accept Pipeline Input? | false
 
  
-###  -Wait
+###  -SucceedIfAlreadyExists
 
 Property               | Value
 ---------------------- | -----

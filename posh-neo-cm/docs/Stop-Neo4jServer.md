@@ -1,20 +1,14 @@
-# Start-Neo4jServer
+# Stop-Neo4jServer
 
 
-Start-Neo4jServer [-Neo4jServer <Object>] [-Wait] [-PassThru] [-ServiceName <string>] [-WhatIf] [-Confirm] [<CommonParameters>]
-
-Start-Neo4jServer -Console [-Neo4jServer <Object>] [-Wait] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
+Stop-Neo4jServer [[-Neo4jServer] <Object>] [[-ServiceName] <string>] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 
 
 
 ## Syntax
 
 ```powershell
-Start-Neo4jServer [-Neo4jServer <Object>] [-Wait] [-PassThru] [-ServiceName <string>] [-WhatIf] [-Confirm] [<CommonParameters>]
-```
-
-```powershell
-Start-Neo4jServer -Console [-Neo4jServer <Object>] [-Wait] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
+Stop-Neo4jServer [-Neo4jServer <Object>] [-ServiceName <string>] [-PassThru] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 
@@ -31,24 +25,13 @@ Default Value          |
 Accept Pipeline Input? | false
 
  
-###  -Console
-
-Property               | Value
----------------------- | -----
-Aliases                | 
-Required?              | true
-Position?              | Named
-Default Value          | 
-Accept Pipeline Input? | false
-
- 
 ###  -Neo4jServer [\<Object\>]
 
 Property               | Value
 ---------------------- | --------------
 Aliases                | 
 Required?              | false
-Position?              | Named
+Position?              | 0
 Default Value          | 
 Accept Pipeline Input? | true (ByValue)
 
@@ -70,18 +53,7 @@ Property               | Value
 ---------------------- | -----
 Aliases                | 
 Required?              | false
-Position?              | Named
-Default Value          | 
-Accept Pipeline Input? | false
-
- 
-###  -Wait
-
-Property               | Value
----------------------- | -----
-Aliases                | 
-Required?              | false
-Position?              | Named
+Position?              | 1
 Default Value          | 
 Accept Pipeline Input? | false
 
