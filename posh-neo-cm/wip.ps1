@@ -1,12 +1,16 @@
 $ErrorActionPreference = 'Stop'
 
 # Approved Verb List
-#https://msdn.microsoft.com/en-us/library/ms714428%28v=vs.85%29.aspx
+# https://msdn.microsoft.com/en-us/library/ms714428%28v=vs.85%29.aspx
+# Writing Help
+# https://technet.microsoft.com/library/hh847834.aspx
 
-$VerbosePreference = 'SilentlyContinue'
+#$VerbosePreference = 'SilentlyContinue'
+$VerbosePreference = 'Continue'
 
 Get-Module -Name 'Neo4j-Management' | Remove-Module
-Import-Module "$PSScriptRoot\src\Neo4j-Management.psd1" | Out-Null
+#Import-Module "$PSScriptRoot\src\Neo4j-Management.psd1" | Out-Null
+Import-Module ".\src\Neo4j-Management.psd1" | Out-Null
 
 #Get-Command -Module 'NeoTechnologies.Neo4jForWindows'
 
@@ -14,7 +18,10 @@ Import-Module "$PSScriptRoot\src\Neo4j-Management.psd1" | Out-Null
 Write-Host "---" -ForegroundColor Yellow
 
 
-"C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jServer | Remove-Neo4jSetting -ConfigurationFile 'neo4j.properties' -Name 'node_auto_indexingxx'
+Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" |
+  Install-Neo4jServer -PassThru |
+  Start-Neo4jServer -PassThru |
+  Remove-Neo4jServer
 
 #Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | Start-Neo4jBackup -Wait -to C:\temp\test
 

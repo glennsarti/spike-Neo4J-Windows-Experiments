@@ -53,21 +53,25 @@ https://github.com/pester/Pester/wiki/Unit-Testing-within-Modules
 https://github.com/pester/Pester/wiki/Mocking-with-Pester
 https://github.com/pester/Pester/wiki/BeforeEach-and-AfterEach
 
-* Add in pre-canned cmdlet to do a basic Neo4j Server setup e.g. Set Http and https port, enable/disable https
-Needs unit tests
+* Add missing unit tests
 
-* Add in pre-canned query to enable and disable clustering (I need to setup clustering first to try this)
-Needs unit tests
+* Do PS 2.0 and PS 3.0 regression tests
+
+* Monitor https://github.com/pester/Pester/issues/353
 
 * Install/Start/Stop/Restart/Remove Neo4j Arbiter Cluster instances
 
 * Install/Start/Stop/Restart/Remove Neo4j Server Service?
-Done - Install, Start 
+Done - Install, Start, Restart, Stop 
 
-* Rename all Validate-* verbs to Confirm-*
-** ALL UNIT TESTS ARE BROKEN **
 
 **DONE**
+
+* (DONE) Add in pre-canned cmdlet to do a basic Neo4j Server setup e.g. Set Http and https port, enable/disable https
+
+* (DONE) Add in pre-canned query to enable and disable clustering (I need to setup clustering first to try this)
+
+* (DONE) Rename all Validate-* verbs to Confirm-*
 
 * (DONE) Start the Neo4j-Shell (easy enough)
 

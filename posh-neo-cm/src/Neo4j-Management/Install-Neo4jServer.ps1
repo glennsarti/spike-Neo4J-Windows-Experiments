@@ -18,9 +18,9 @@
 
 
 
-Function Install-Neo4jService
+Function Install-Neo4jServer
 {
-  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Low')]
+  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Medium')]
   param (
     [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
     [object]$Neo4jServer = ''

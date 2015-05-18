@@ -20,7 +20,7 @@
 
 Function Start-Neo4jServer
 {
-  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Low',DefaultParameterSetName='WindowsService')]
+  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Medium',DefaultParameterSetName='WindowsService')]
   param (
     [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
     [object]$Neo4jServer = ''
@@ -101,7 +101,7 @@ Function Start-Neo4jServer
         return
       }
 
-      $result = Start-Service -Name $ServiceName
+      $result = Start-Service -Name $ServiceName -PassThru
       if ($PassThru) { Write-Output $thisServer } else { Write-Output $result }
     }
   }

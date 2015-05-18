@@ -17,7 +17,79 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+<#
+.Synopsis
+Initializes a Neo4j installation with common settings
 
+.Synopsis
+Initializes a Neo4j installation with common settings such as HTTP port number.
+
+.PARAMETER Neo4jServer
+A directory path or Neo4j server object to the Neo4j instance to initialize
+
+.PARAMETER PassThru
+Pass through the Neo4j server object instead of the initialized settings
+
+.PARAMETER HTTPPort
+TCP Port used to communicate via the HTTP protocol. Valid values are 0 to 65535
+
+.PARAMETER EnableHTTPS
+Enabled the HTTPS protocol.  By default this is disable
+
+.PARAMETER HTTPSPort
+TCP Port used to communicate via the HTTPS protocol. Valid values are 0 to 65535
+
+.PARAMETER EnableRemoteShell
+Enable the Remote Shell for the Neo4j Server.  By default this is disabled
+
+.PARAMETER RemoteShellPort
+TCP Port used to communicate with the Neo4j Server. Valid values are 0 to 65535
+Requires the EnableRemoteShell switch.
+
+.PARAMETER ListenOnIPAddress
+The IP Address to listen for incoming connections.  By default his is 127.0.0.1 (localhost). Valid values are IP Addresses in x.x.x.x format
+Use 0.0.0.0 to use any network interface
+
+.PARAMETER DisableAuthentication
+Disable the Neo4j authentication.  By default authentication is enabled
+This is only applicable to Neo4j 2.2 and above.
+
+.PARAMETER ClearExistingDatabase
+Delete the existing graph data files
+
+.PARAMETER DisableOnlineBackup
+Disable the online backup service
+This only applicable to Enterprise Neo4j Servers and will throw an error on Community servers
+
+.PARAMETER OnlineBackupServer
+Host and port number to listen for online backup service requests.  This can be a single host and port, or a single host and port range
+e.g. 127.0.0.1:6000 or 10.1.2.3:6000-6009
+If a port range is specified, Neo4j will attempt to listen on the next free port number, starting at the lowest.
+This only applicable to Enterprise Neo4j Servers and will throw an error on Community servers
+ 
+
+.Example
+'C:\Neo4j\neo4j-community' | Initialize-Neo4jServer -HTTPPort 8000
+
+Set the HTTP port to 8000 and use all other defaults for the Neo4j installation at C:\Neo4j\neo4j-community
+
+.Example
+Get-Neo4jServer 'C:\Neo4j\neo4j-community' | Initialize-Neo4jServer -HTTPPort 8000 -EnableRemoteShell -RemoteShellPort 40000
+
+Set the HTTP port to 8000, use the Remote Shell on port 40000 and use all other defaults for the Neo4j installation at C:\Neo4j\neo4j-community
+
+.Example
+Initialize-Neo4jServer -Neo4jHome 'C:\Neo4j\neo4j-enterprise' -EnableHTTPS -OnlineBackupServer 127.0.0.1:5690
+
+Enable HTTPS on the default port and the backup server on localhost port 5690 for the Neo4j installation at C:\Neo4j\neo4j-enterprise
+
+.Link
+https://github.com/glennsarti/spike-Neo4J-Windows-Experiments/blob/master/posh-neo-cm/docs/Initialize-Neo4jServer.md
+
+.Link
+Get-Neo4jServer
+
+#>
 Function Initialize-Neo4jServer
 {
   [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='High')]
