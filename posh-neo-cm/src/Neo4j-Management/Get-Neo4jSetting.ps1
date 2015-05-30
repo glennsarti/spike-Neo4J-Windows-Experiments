@@ -26,7 +26,7 @@ Function Get-Neo4jSetting
     [object]$Neo4jServer = ''
 
     ,[Parameter(Mandatory=$false)]
-    [string[]]$ConfigurationFile = ('neo4j.properties','neo4j-server.properties','neo4j-wrapper.conf')
+    [string[]]$ConfigurationFile = $null
 
     ,[Parameter(Mandatory=$false)]
     [string]$Name = ''
@@ -57,8 +57,13 @@ Function Get-Neo4jSetting
       }
     }
     if ($thisServer -eq $null) { return }
-   
-    $ConfiguredSettings = ""
+
+    # Set the default list of configuration files    
+    if ($ConfigurationFile -eq $null)
+    {
+      $ConfigurationFile = ('neo4j.properties','neo4j-server.properties','neo4j-wrapper.conf')
+      if ($thisServer.ServerType -eq 'Enterprise') { $ConfigurationFile += 'arbiter-wrapper.conf' }
+    }
    
     $ConfigurationFile | ForEach-Object -Process `
     {

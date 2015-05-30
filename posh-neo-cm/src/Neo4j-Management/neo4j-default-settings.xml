@@ -71,9 +71,11 @@
     <setting file="neo4j.properties" name="ha.phase2_timeout">5s</setting>
     <setting file="neo4j.properties" name="ha.pull_interval"></setting>
     <setting file="neo4j.properties" name="ha.server_id"></setting>
-
     
     <setting file="neo4j-server.properties" name="org.neo4j.server.database.mode">SINGLE</setting>    
+
+    <setting file="arbiter-wrapper.conf" name="wrapper.name">neo4j-arbiter</setting>    
+    <setting file="neo4j-wrapper.conf" name="wrapper.name">Neo4j-Server</setting>    
   </section>
 
 </defaults>

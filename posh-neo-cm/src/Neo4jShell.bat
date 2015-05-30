@@ -16,5 +16,6 @@ rem GNU General Public License for more details.
 rem
 rem You should have received a copy of the GNU General Public License
 rem along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; Exit (Get-Neo4jServer '%~dp0..' | Start-Neo4jShell %* -Wait)"
 EXIT /B %ERRORLEVEL%

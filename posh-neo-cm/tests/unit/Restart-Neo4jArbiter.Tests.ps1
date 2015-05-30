@@ -6,7 +6,7 @@ $common = Join-Path (Split-Path -Parent $here) 'Common.ps1'
 Import-Module "$src\Neo4j-Management.psm1"
 
 InModuleScope Neo4j-Management {
-  Describe "Remove-Neo4jServer" {
+  Describe "Restart-Neo4jArbiter" {
     Context "Unit Tests" {
       It "should have unit tests" {
         $false | Should Be $true  

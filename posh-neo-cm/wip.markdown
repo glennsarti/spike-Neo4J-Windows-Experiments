@@ -59,13 +59,15 @@ https://github.com/pester/Pester/wiki/BeforeEach-and-AfterEach
 
 * Monitor https://github.com/pester/Pester/issues/353
 
-* Install/Start/Stop/Restart/Remove Neo4j Arbiter Cluster instances
+* Neo4jImport (BAt and PS1)
 
-* Install/Start/Stop/Restart/Remove Neo4j Server Service?
-Done - Install, Start, Restart, Stop 
-
+* Test Neo4jInstaller BAT
 
 **DONE**
+
+* (DONE) Install/Start/Stop/Restart/Remove Neo4j Arbiter Cluster instances
+
+* (DONE) Install/Start/Stop/Restart/Remove Neo4j Server Service
 
 * (DONE) Add in pre-canned cmdlet to do a basic Neo4j Server setup e.g. Set Http and https port, enable/disable https
 

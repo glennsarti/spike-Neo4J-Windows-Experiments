@@ -18,18 +18,18 @@
 
 
 
-Function Remove-Neo4jServer
+Function Restart-Neo4jArbiter
 {
   [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Medium')]
   param (
     [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
     [object]$Neo4jServer = ''
+
+    ,[Parameter(Mandatory=$false)]
+    [switch]$PassThru   
     
     ,[Parameter(Mandatory=$false)]
     [string]$ServiceName = ''
-
-    ,[Parameter(Mandatory=$false)]
-    [switch]$SucceedIfNotExists   
   )
   
   Begin
@@ -60,34 +60,18 @@ Function Remove-Neo4jServer
     
     if ($ServiceName -eq '')
     {
-      $setting = ($thisServer | Get-Neo4jSetting -ConfigurationFile 'neo4j-wrapper.conf' -Name 'wrapper.name')
+      $setting = ($thisServer | Get-Neo4jSetting -ConfigurationFile 'arbiter-wrapper.conf' -Name 'wrapper.name')
       if ($setting -ne $null) { $ServiceName = $setting.Value }
     }
 
     if ($ServiceName -eq '')
     {
-      Throw "Could not find the Windows Service Name for Neo4j"
-      return
-    }
-    
-    # Get the Service object as a WMI object.  Can only do deletions through WMI or SC.EXE
-    $service = Get-WmiObject -Class Win32_Service -Filter "Name='$ServiceName'"
-    if (($service -eq $null) -and (-not $SucceedIfNotExists) ) 
-    {
-      Throw "Windows service $ServiceName cannot be removed as it does not exist"
+      Throw "Could not find the Windows Service Name for Neo4j Arbiter"
       return
     }
 
-    if ($service -ne $null)
-    {
-      Stop-Service -ServiceName $ServiceName | Out-Null
-      if ($PSCmdlet.ShouldProcess($ServiceName, 'Remove Windows Service'))
-      {  
-        $service.delete() | Out-Null
-      }        
-    }
-    
-    Write-Output $thisServer
+    $result = Restart-Service -Name $ServiceName -PassThru
+    if ($PassThru) { Write-Output $thisServer } else { Write-Output $result }
   }
   
   End

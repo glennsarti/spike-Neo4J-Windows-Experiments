@@ -87,14 +87,19 @@ FunctionsToExport = @(
 'Initialize-Neo4jHACluster'
 'Initialize-Neo4jServer'
 'Install-Neo4jServer'
-'Remove-Neo4jServer'
+'Install-Neo4jArbiter'
 'Remove-Neo4jSetting'
 'Restart-Neo4jServer'
+'Restart-Neo4jArbiter'
 'Set-Neo4jSetting'
 'Start-Neo4jBackup'
 'Start-Neo4jServer'
+'Start-Neo4jArbiter'
 'Start-Neo4jShell'
 'Stop-Neo4jServer'
+'Stop-Neo4jArbiter'
+'Uninstall-Neo4jServer'
+'Uninstall-Neo4jArbiter'
 )
 
 # Cmdlets to export from this module

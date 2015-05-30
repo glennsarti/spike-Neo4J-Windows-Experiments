@@ -18,10 +18,7 @@ Import-Module ".\src\Neo4j-Management.psd1" | Out-Null
 Write-Host "---" -ForegroundColor Yellow
 
 
-Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" |
-  Install-Neo4jServer -PassThru |
-  Start-Neo4jServer -PassThru |
-  Remove-Neo4jServer
+Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | Get-Neo4jSetting | Out-GridView -Wait
 
 #Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | Start-Neo4jBackup -Wait -to C:\temp\test
 

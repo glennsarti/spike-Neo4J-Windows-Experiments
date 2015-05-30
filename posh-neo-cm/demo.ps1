@@ -38,7 +38,7 @@ Import-Module "$PSScriptRoot\src\Neo4j-Management.psd1" | Out-Null
 #"C:\tools\neo4j-community\neo4j-community-2.2.0" | Start-Neo4jShell -Wait
 
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-# Three Node Cluster
+# Three Node Cluster (2 x Database + 1 x Arbiter)
 #   Note the -ClearExistingDatabase
 # Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | `
 #   Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -HTTPPort 7474 -ClearExistingDatabase -OnlineBackupServer '127.0.0.1:6362' -PassThru | `
@@ -50,7 +50,7 @@ Import-Module "$PSScriptRoot\src\Neo4j-Management.psd1" | Out-Null
 # Get-Neo4jServer "C:\tools\neo4j-enterprise2\neo4j-enterprise-2.2.0" | `
 #   Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -HTTPPort 7475 -ClearExistingDatabase -OnlineBackupServer '127.0.0.1:6363' -PassThru | `
 #   Initialize-Neo4jHACluster -ServerID 2 -InitialHosts '127.0.0.1:5001' -ClusterServer '127.0.0.1:5002' -HAServer '127.0.0.1:6002' -DisallowClusterInit -PassThru | `
-#   Start-Neo4jServer -Console
+#   Start-Neo4jArbiter -Console
 # 
 # Get-Neo4jServer "C:\tools\neo4j-enterprise3\neo4j-enterprise-2.2.0" | `
 #   Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -HTTPPort 7476 -ClearExistingDatabase -OnlineBackupServer '127.0.0.1:6364' -PassThru | `
