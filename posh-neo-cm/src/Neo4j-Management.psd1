@@ -83,6 +83,7 @@ NestedModules = @('Neo4j-Management\Neo4j-Management.psm1')
 FunctionsToExport = @(
 'Get-Neo4jHome'
 'Get-Neo4jServer'
+'Get-Neo4jServerStatus'
 'Get-Neo4jSetting'
 'Initialize-Neo4jHACluster'
 'Initialize-Neo4jServer'

@@ -18,26 +18,17 @@
 
 
 
-Function Start-Neo4jServer
+Function Get-Neo4jServerStatus
 {
-  [cmdletBinding(SupportsShouldProcess=$true,ConfirmImpact='Medium',DefaultParameterSetName='WindowsService')]
+  [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Medium',DefaultParameterSetName='DefaultStatus')]
   param (
     [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
     [object]$Neo4jServer = ''
 
-    ,[Parameter(Mandatory=$true,ParameterSetName='Console')]
-    [switch]$Console
-
-    ,[Parameter(Mandatory=$false)]
-    [switch]$Wait
-
-    ,[Parameter(Mandatory=$false)]
-    [switch]$PassThru   
-    
-    ,[Parameter(Mandatory=$false,ParameterSetName='WindowsService')]
+    ,[Parameter(Mandatory=$false,ParameterSetName='LegacyStatus')]
     [string]$ServiceName = ''
 
-    ,[Parameter(Mandatory=$false)]
+    ,[Parameter(Mandatory=$true,ParameterSetName='LegacyStatus')]
     [Alias('Legacy')]
     [switch]$LegacyOutput
   )
@@ -67,49 +58,43 @@ Function Start-Neo4jServer
       }
     }
     if ($thisServer -eq $null) { return }
-    
-    $JavaCMD = Get-Java -BaseDir $thisServer.Home
-    if ($JavaCMD -eq $null)
-    {
-      Throw "Unable to locate Java"
-      return
-    }
 
-    if ($PsCmdlet.ParameterSetName -eq 'Console')
-    {    
-  
-      $ShellArgs = @( `
-        "-DworkingDir=`"$($thisServer.Home)`"" `
-        ,"-Djava.util.logging.config.file=`"$($thisServer.Home)\conf\windows-wrapper-logging.properties`"" `
-        ,"-DconfigFile=`"conf/neo4j-wrapper.conf`"" `
-        ,"-DserverClasspath=`"lib/*.jar;system/lib/*.jar;plugins/**/*.jar;./conf*`"" `
-        ,"-DserverMainClass=org.neo4j.server.Bootstrapper" `
-        ,"-jar","$($thisServer.Home)\bin\windows-service-wrapper-5.jar"      
-      )
-      $result = (Start-Process -FilePath $JavaCMD.java -ArgumentList $ShellArgs -Wait:$Wait -NoNewWindow:$Wait -PassThru -WorkingDirectory $thisServer.Home )
-      
-      if ($PassThru) { Write-Output $thisServer } else { Write-Output $result.ExitCode }
-    }
-    
-    if ($PsCmdlet.ParameterSetName -eq 'WindowsService')
+    # Legacy way of getting Neo4jServer Status.  VERY limited information
+    if ($PsCmdlet.ParameterSetName -eq 'LegacyStatus')
     {
+      # Note - This 'legacy mode' code has intentional logic errors.  It emulates the behaviour of the old Neo4jInstaller.BAT script exactly; errors and all.
       if ($ServiceName -eq '')
       {
         $setting = ($thisServer | Get-Neo4jSetting -ConfigurationFile 'neo4j-wrapper.conf' -Name 'wrapper.name')
         if ($setting -ne $null) { $ServiceName = $setting.Value }
       }
-
+  
       if ($ServiceName -eq '')
       {
-        if ($LegacyOutput) { Write-Host "Could not find the Windows Service Name for Neo4j" }
-        Throw "Could not find the Windows Service Name for Neo4j"
+        Write-Host '"NOT INSTALLED"'
         return
       }
+      
+      try
+      {
+        $result = Get-Service -Name $ServiceName -ErrorAction 'Stop'
 
-      if ($LegacyOutput) { Write-Host "Starting $($ServiceName)..." }
-      $result = Start-Service -Name $ServiceName -PassThru
-      if ($LegacyOutput) { Write-Host "Service started" }
-      if ($PassThru) { Write-Output $thisServer } else { Write-Output $result }
+        switch ($result.Status)
+        {
+          'Running' { Write-Host '"RUNNING"' }
+          'Stopped' { Write-Host '"STOPPED"' }
+          default   { Write-Host '"NOT INSTALLED"' }
+        }        
+      }
+      catch
+      {
+        Write-Host '"NOT INSTALLED"'
+      }
+    }
+
+    if ($PsCmdlet.ParameterSetName -eq 'DefaultStatus')
+    {
+      Throw 'Not Implemented'
     }
   }
   

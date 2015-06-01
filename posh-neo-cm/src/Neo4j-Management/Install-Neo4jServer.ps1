@@ -43,6 +43,10 @@ Function Install-Neo4jServer
 
     ,[Parameter(Mandatory=$false)]
     [switch]$PassThru   
+
+    ,[Parameter(Mandatory=$false)]
+    [Alias('Legacy')]
+    [switch]$LegacyOutput
     
     # Optionally run the service under an account other than LOCAL SYSTEM?
   )
@@ -76,10 +80,12 @@ Function Install-Neo4jServer
     $JavaCMD = Get-Java -BaseDir $thisServer.Home
     if ($JavaCMD -eq $null)
     {
+      if ($LegacyOutput) { Write-Host "Unable to locate Java" }
       Throw "Unable to locate Java"
       return
     }
     
+    $Name = $Name.Trim()
     if ($DisplayName -eq '') { $DisplayName = $Name }
 
     $binPath = "`"$($JavaCMD.java)`"" + `
@@ -97,7 +103,16 @@ Function Install-Neo4jServer
     {
       $result = Get-Service -Name $Name -ComputerName '.' -ErrorAction 'SilentlyContinue'
     }
-    if ($result -eq $null) { $result = (New-Service -Name $Name -Description $Description -DisplayName $Name -BinaryPathName $binPath -StartupType $StartType) }
+    if ($result -eq $null)
+    {
+      if ($LegacyOutput) { Write-Host "Installing $($Name)..." }
+      $result = (New-Service -Name $Name -Description $Description -DisplayName $Name -BinaryPathName $binPath -StartupType $StartType)
+      if ($LegacyOutput) { Write-Host "Service installed" }
+    }
+    else
+    {
+      if ($LegacyOutput) { Write-Host "Service is already installed" }
+    }
     
     $thisServer | Set-Neo4jSetting -ConfigurationFile 'neo4j-wrapper.conf' -Name 'wrapper.name' -Value $Name | Out-Null
     

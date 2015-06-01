@@ -19,49 +19,48 @@ rem along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SETLOCAL ENABLEEXTENSIONS
 
-IF NOT [%2]==[] set serviceName=%2
-IF NOT [%3]==[] set serviceDisplayName=%3
-IF NOT %serviceName: =% == %serviceName% GOTO :Usage
+IF NOT [%2]==[] SET serviceName=%2
+IF NOT [%3]==[] SET serviceDisplayName=%3
 
 IF NOT [%serviceName%]==[] set serviceName=-Name '%serviceName%'
 IF NOT [%serviceDisplayName%]==[] set serviceDisplayName=-DisplayName '%serviceDisplayName%'
 
-GOTO :Main %1 %2 %3
+IF [%1] == []        GOTO :Usage
+IF [%1] == [remove]  GOTO :Remove
+IF [%1] == [install] GOTO :Install
+IF [%1] == [stop]    GOTO :Stop
+IF [%1] == [start]   GOTO :Start
+IF [%1] == [status]  GOTO :Status
+CALL :Usage
+EXIT /B 0
 
 :Usage
-  ECHO Usage: %~0Neo4jInstaller.bat ^<install^|remove^|stop^|start^|status> [service name] [service display name]
+  ECHO This script is provided for legacy purposes.  Please use the Powershell Module
+  ECHO Usage: %~dp0Neo4jInstaller.bat ^<install^|remove^|stop^|start^|status^> [service name] [service display name]
   ECHO        - Service Name - Optional, must NOT contain spaces
   ECHO        - Service Display Name - Optional, The name displayed in the services window, surround with quotes to use spaces
-  GOTO :eof
-
+  EXIT /B 0
+  
 :Status
-  REM Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; Exit (Get-Neo4jServer '%~dp0..' | Stop-Neo4jServer %serviceName%)"
-  REM EXIT /B %ERRORLEVEL%
-  ECHO Not implemented
-  EXIT 255 /B
+  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; $ErrorActionPreference = 'Stop'; Exit (Get-Neo4jServer '%~dp0..' | Get-Neo4jServerStatus %serviceName% -Legacy)"
+  EXIT /B %ERRORLEVEL%
 
 :Stop
-  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; Exit (Get-Neo4jServer '%~dp0..' | Stop-Neo4jServer %serviceName%)"
+  ECHO This script is provided for legacy purposes.  Please use the Powershell Module
+  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; $ErrorActionPreference = 'Stop'; Exit (Get-Neo4jServer '%~dp0..' | Stop-Neo4jServer %serviceName%  -Legacy)"
   EXIT /B %ERRORLEVEL%
 
 :Start
-  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; Exit (Get-Neo4jServer '%~dp0..' | Start-Neo4jServer %serviceName%)"
+  ECHO This script is provided for legacy purposes.  Please use the Powershell Module
+  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; $ErrorActionPreference = 'Stop'; Exit (Get-Neo4jServer '%~dp0..' | Start-Neo4jServer %serviceName% -Legacy)"
   EXIT /B %ERRORLEVEL%
 
 :Remove
-  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; Exit (Get-Neo4jServer '%~dp0..' | Uninstall-Neo4jServer %serviceName%)"
+  ECHO This script is provided for legacy purposes.  Please use the Powershell Module
+  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; $ErrorActionPreference = 'Stop'; Exit (Get-Neo4jServer '%~dp0..' | Uninstall-Neo4jServer %serviceName% -Legacy)"
   EXIT /B %ERRORLEVEL%
 
 :Install
-  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; Exit (Get-Neo4jServer '%~dp0..' | Install-Neo4jServer %serviceName% %serviceDisplayName%)"
+  ECHO This script is provided for legacy purposes.  Please use the Powershell Module
+  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; $ErrorActionPreference = 'Stop'; Exit (Get-Neo4jServer '%~dp0..' | Install-Neo4jServer %serviceName% %serviceDisplayName% -Legacy -PassThru | Start-Neo4jServer -Legacy)"
   EXIT /B %ERRORLEVEL%
-
-:Main
-  if "%1" == "" goto :Usage
-  if "%1" == "remove"  goto :Remove
-  if "%1" == "install" goto :Install
-  if "%1" == "stop" goto :Stop
-  if "%1" == "start" goto :Start
-  if "%1" == "status" goto :Status
-  CALL :Usage
-  GOTO :eof
