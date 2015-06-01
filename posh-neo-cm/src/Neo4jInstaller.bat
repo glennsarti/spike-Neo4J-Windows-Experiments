@@ -42,25 +42,25 @@ EXIT /B 0
   EXIT /B 0
   
 :Status
-  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; $ErrorActionPreference = 'Stop'; Exit (Get-Neo4jServer '%~dp0..' | Get-Neo4jServerStatus %serviceName% -Legacy)"
+  Powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; Import-Module '%~dp0Neo4j-Management.psd1'; Exit (Get-Neo4jServer '%~dp0..' | Get-Neo4jServerStatus %serviceName% -Legacy)"
   EXIT /B %ERRORLEVEL%
 
 :Stop
   ECHO This script is provided for legacy purposes.  Please use the Powershell Module
-  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; $ErrorActionPreference = 'Stop'; Exit (Get-Neo4jServer '%~dp0..' | Stop-Neo4jServer %serviceName%  -Legacy)"
+  Powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; Import-Module '%~dp0Neo4j-Management.psd1'; Exit (Get-Neo4jServer '%~dp0..' | Stop-Neo4jServer %serviceName%  -Legacy)"
   EXIT /B %ERRORLEVEL%
 
 :Start
   ECHO This script is provided for legacy purposes.  Please use the Powershell Module
-  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; $ErrorActionPreference = 'Stop'; Exit (Get-Neo4jServer '%~dp0..' | Start-Neo4jServer %serviceName% -Legacy)"
+  Powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; Import-Module '%~dp0Neo4j-Management.psd1'; Exit (Get-Neo4jServer '%~dp0..' | Start-Neo4jServer %serviceName% -Legacy)"
   EXIT /B %ERRORLEVEL%
 
 :Remove
   ECHO This script is provided for legacy purposes.  Please use the Powershell Module
-  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; $ErrorActionPreference = 'Stop'; Exit (Get-Neo4jServer '%~dp0..' | Uninstall-Neo4jServer %serviceName% -Legacy)"
+  Powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; Import-Module '%~dp0Neo4j-Management.psd1'; Exit (Get-Neo4jServer '%~dp0..' | Uninstall-Neo4jServer %serviceName% -Legacy)"
   EXIT /B %ERRORLEVEL%
 
 :Install
   ECHO This script is provided for legacy purposes.  Please use the Powershell Module
-  Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; $ErrorActionPreference = 'Stop'; Exit (Get-Neo4jServer '%~dp0..' | Install-Neo4jServer %serviceName% %serviceDisplayName% -Legacy -PassThru | Start-Neo4jServer -Legacy)"
+  Powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; Import-Module '%~dp0Neo4j-Management.psd1'; Exit (Get-Neo4jServer '%~dp0..' | Install-Neo4jServer %serviceName% %serviceDisplayName% -Legacy -PassThru | Start-Neo4jServer -Legacy)"
   EXIT /B %ERRORLEVEL%

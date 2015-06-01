@@ -6,7 +6,7 @@ $ErrorActionPreference = 'Stop'
 # https://technet.microsoft.com/library/hh847834.aspx
 
 #$VerbosePreference = 'SilentlyContinue'
-$VerbosePreference = 'Continue'
+#$VerbosePreference = 'Continue'
 
 Get-Module -Name 'Neo4j-Management' | Remove-Module
 #Import-Module "$PSScriptRoot\src\Neo4j-Management.psd1" | Out-Null
@@ -17,8 +17,13 @@ Import-Module ".\src\Neo4j-Management.psd1" | Out-Null
 #"C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0","C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jServer
 Write-Host "---" -ForegroundColor Yellow
 
+#-=-=-= Import Test
+Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | `
+  Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -ClearExistingDatabase -PassThru | `
+  Start-Neo4jImport -FromPipeline -Wait -PassThru --nodes "Z:\Projects\spike-Neo4J-Windows-Experiments\posh-neo-cm\movies.csv" --nodes "Z:\Projects\spike-Neo4J-Windows-Experiments\posh-neo-cm\actors.csv" --relationships "Z:\Projects\spike-Neo4J-Windows-Experiments\posh-neo-cm\roles.csv" | `
+  Start-Neo4jServer -Console -Wait
 
-Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | Get-Neo4jSetting | Out-GridView -Wait
+#$server | start-Neo4jServer -Console -Wait
 
 #Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | Start-Neo4jBackup -Wait -to C:\temp\test
 

@@ -59,11 +59,12 @@ https://github.com/pester/Pester/wiki/BeforeEach-and-AfterEach
 
 * Monitor https://github.com/pester/Pester/issues/353
 
-* Neo4jImport (BAt and PS1)
-
-* Test Neo4jInstaller BAT
 
 **DONE**
+
+* (DONE) Neo4jImport (BAt and PS1)
+
+* (DONE) Test Neo4jInstaller BAT
 
 * (DONE) Install/Start/Stop/Restart/Remove Neo4j Arbiter Cluster instances
 

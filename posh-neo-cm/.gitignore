@@ -5,6 +5,9 @@
 artifacts/
 build/nuget.exe
 pester/*
+actors.csv
+movies.csv
+roles.csv
 
 # User-specific files
 *.suo

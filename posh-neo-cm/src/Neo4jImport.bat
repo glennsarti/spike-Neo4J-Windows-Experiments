@@ -17,8 +17,8 @@ rem
 rem You should have received a copy of the GNU General Public License
 rem along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-rem Powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module '%~dp0Neo4j-Management.psd1'; Exit (Get-Neo4jServer '%~dp0..' | Import-Neo4jServer ????)"
-rem EXIT /B %ERRORLEVEL%
+ECHO This script is provided for legacy purposes.  Please use the Powershell Module
+ECHO The --into parameter is optional
 
-ECHO Not Implemented
-EXIT /B 255
+Powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; Import-Module '%~dp0Neo4j-Management.psd1'; Exit (Get-Neo4jServer '%~dp0..' | Start-Neo4jImport -FromPipeline -Wait %* )"
+EXIT /B %ERRORLEVEL%
