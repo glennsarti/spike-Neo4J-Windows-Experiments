@@ -58,7 +58,7 @@ InModuleScope Neo4j-Management {
       }
     }
 
-# Raised an issue with Pester.  Really weird error running PS 2.0 and mocking the Start-Process function (https://github.com/pester/Pester/issues/353)
+# Raised an issue with Pester.  https://github.com/pester/Pester/issues/353.  Will enable this tests once the issue is resolved and tested.
 if ($PSVersionTable.PSVersion -ne '2.0') {
     Context "Uses default values" {
       Mock Get-Neo4jServer { return New-Object -TypeName PSCustomObject -Property (@{'Home' = 'TestDrive:\FakeDir'; 'ServerVersion' = '99.99'; 'ServerType' = 'Community'; }) }

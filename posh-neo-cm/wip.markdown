@@ -59,8 +59,13 @@ https://github.com/pester/Pester/wiki/BeforeEach-and-AfterEach
 
 * Monitor https://github.com/pester/Pester/issues/353
 
+* Breaking change in the way 2.3-SNAP launches Neo4j.  No more common bootstrapper
+
+* Need to add detection for ADVANCED version of Neo4j
 
 **DONE**
+
+* (DONE) Complete the 2.3 default settings
 
 * (DONE) Neo4jImport (BAt and PS1)
 
