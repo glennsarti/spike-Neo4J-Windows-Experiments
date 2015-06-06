@@ -17,11 +17,18 @@ Import-Module ".\src\Neo4j-Management.psd1" | Out-Null
 #"C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0","C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jServer
 Write-Host "---" -ForegroundColor Yellow
 
+
+# 'C:\tools\neo4j-enterprise\ORIG-neo4j-enterprise-2.3-SNAPSHOT'
+# 'C:\tools\neo4j-advanced\ORIG-neo4j-advanced-2.3-SNAPSHOT'
+# 'C:\tools\neo4j-community\ORIG-neo4j-community-2.3-SNAPSHOT'
+
+'C:\tools\neo4j-enterprise\ORIG-neo4j-enterprise-2.3-SNAPSHOT' | Get-Neo4jServer | Install-Neo4jServer -PassThru | Start-Neo4jServer
+
 #-=-=-= Import Test
-Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | `
-  Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -ClearExistingDatabase -PassThru | `
-  Start-Neo4jImport -FromPipeline -Wait -PassThru --nodes "Z:\Projects\spike-Neo4J-Windows-Experiments\posh-neo-cm\movies.csv" --nodes "Z:\Projects\spike-Neo4J-Windows-Experiments\posh-neo-cm\actors.csv" --relationships "Z:\Projects\spike-Neo4J-Windows-Experiments\posh-neo-cm\roles.csv" | `
-  Start-Neo4jServer -Console -Wait
+#Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | `
+#  Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -ClearExistingDatabase -PassThru | `
+#  Start-Neo4jImport -FromPipeline -Wait -PassThru --nodes "Z:\Projects\spike-Neo4J-Windows-Experiments\posh-neo-cm\movies.csv" --nodes "Z:\Projects\spike-Neo4J-Windows-Experiments\posh-neo-cm\actors.csv" --relationships "Z:\Projects\spike-Neo4J-Windows-Experiments\posh-neo-cm\roles.csv" | `
+#  Start-Neo4jServer -Console -Wait
 
 #$server | start-Neo4jServer -Console -Wait
 

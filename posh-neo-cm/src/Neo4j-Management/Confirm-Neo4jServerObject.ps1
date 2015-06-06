@@ -38,7 +38,7 @@ Function Confirm-Neo4jServerObject
     if ($Neo4jServer.Home -eq $null) { return $false }
     if ($Neo4jServer.ServerType -eq $null) { return $false }
     
-    if ( ($Neo4jServer.ServerType -ne 'Community') -and ($Neo4jServer.ServerType -ne 'Enterprise') ) { return $false }    
+    if ( ($Neo4jServer.ServerType -ne 'Community') -and ($Neo4jServer.ServerType -ne 'Enterprise') -and ($Neo4jServer.ServerType -ne 'Advanced') ) { return $false }    
     if (-not (Test-Path -Path ($Neo4jServer.Home))) { return $false }
     
     return $true

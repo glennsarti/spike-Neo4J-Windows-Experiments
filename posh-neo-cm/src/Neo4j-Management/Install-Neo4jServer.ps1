@@ -88,13 +88,26 @@ Function Install-Neo4jServer
     $Name = $Name.Trim()
     if ($DisplayName -eq '') { $DisplayName = $Name }
 
+    # Note - For some reason -DserverMainClass must appear before -jar in the argument list.  Changing this order raises a Null Pointer Exception in the Windows Service Wrapper
+    $serverMainClass = ''
+    # Server Class Path for version 2.3 and above
+    if ($thisServer.ServerType -eq 'Advanced') { $serverMainClass = 'org.neo4j.server.advanced.AdvancedBootstrapper' }
+    if ($thisServer.ServerType -eq 'Enterprise') { $serverMainClass = 'org.neo4j.server.enterprise.EnterpriseBootstrapper' }
+    if ($thisServer.ServerType -eq 'Community') { $serverMainClass = 'org.neo4j.server.CommunityBootstrapper' }
+    # Server Class Path for version 2.2 and below
+    if ($thisServer.ServerVersion -match '^(2\.2|2\.1|2\.0|1\.)')
+    {
+      $serverMainClass = 'org.neo4j.server.Bootstrapper'
+    }
+    if ($serverMainClass -eq '') { Write-Error "Unable to determine the Server Main Class from the server information"; return }
+      
     $binPath = "`"$($JavaCMD.java)`"" + `
                " -DworkingDir=`"$($thisServer.Home)`"" + `
                " -Djava.util.logging.config.file=`"$($thisServer.Home)\conf\windows-wrapper-logging.properties`"" + `
                " -DconfigFile=`"conf/neo4j-wrapper.conf`"" + `
                " -Dorg.neo4j.cluster.logdirectory==`"$($thisServer.Home)\data\log`"" + `
                " -DserverClasspath=`"lib/*.jar;system/lib/*.jar;plugins/**/*.jar;./conf*`"" + `
-               " -DserverMainClass=org.neo4j.server.Bootstrapper" + `
+               " -DserverMainClass=$($serverMainClass)" + `
                " -jar `"$($thisServer.Home)\bin\windows-service-wrapper-5.jar`"" + `
                " $Name"
 
@@ -103,6 +116,7 @@ Function Install-Neo4jServer
     {
       $result = Get-Service -Name $Name -ComputerName '.' -ErrorAction 'SilentlyContinue'
     }
+
     if ($result -eq $null)
     {
       if ($LegacyOutput) { Write-Host "Installing $($Name)..." }

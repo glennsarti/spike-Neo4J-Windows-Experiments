@@ -106,6 +106,34 @@ InModuleScope Neo4j-Management {
       }
     }
 
+    Context "Valid Advanced Neo4j installation" {
+      Mock Get-Neo4jHome { return }
+      Mock Confirm-Neo4jHome { return $true }
+      Mock Confirm-Neo4jServerObject { return $true }
+      Mock Get-ChildItem { return (@{ 'Name' = 'neo4j-server-advanced-99.99.jar'},@{ 'Name' = 'neo4j-server-99.99.jar'}) }
+      
+      $neoServer = Get-Neo4jServer -Neo4jHome 'TestDrive:\SomePath' -ErrorAction Stop
+  
+      It "does not attempt to get the default home" {
+        Assert-MockCalled Get-Neo4jHome -Times 0
+      }
+      It "attempts to validate the home" {
+        Assert-MockCalled Confirm-Neo4jHome -Times 1
+      }    
+      It "attempts to validate the server details" {
+        Assert-MockCalled Confirm-Neo4jServerObject -Times 1
+      }    
+      It "detects an advanced edition" {
+         $neoServer.ServerType | Should Be "Advanced"      
+      }
+      It "detects correct version" {
+         $neoServer.ServerVersion | Should Be "99.99"      
+      }
+      It "detects correct home path" {
+         $neoServer.Home | Should Be 'TestDrive:\SomePath'
+      }
+    }
+
     Context "Valid Community Neo4j installation" {
       Mock Get-Neo4jHome { return }
       Mock Confirm-Neo4jHome { return $true }

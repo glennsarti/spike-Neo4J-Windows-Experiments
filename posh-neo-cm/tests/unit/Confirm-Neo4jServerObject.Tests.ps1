@@ -38,7 +38,7 @@ InModuleScope Neo4j-Management {
         }
         (Confirm-Neo4jServerObject -Neo4jServer $serverObject) | Should be $false
       }
-      It "return false if ServerType is not Community or Enterprise" {
+      It "return false if ServerType is not Community, Advanced or Enterprise" {
         $serverObject = New-Object -TypeName PSCustomObject -Property @{
           'Home' = 'TestDrive:\SomePath';
           'ServerVersion' = '99.99';
@@ -56,7 +56,7 @@ InModuleScope Neo4j-Management {
       }
     }
   
-    Context "Valid Server Object" {
+    Context "Valid Community Server Object" {
       # Setup
       $neo4jPath = 'TestDrive:\Neo4j'
       Mock Test-Path { $true }  -ParameterFilter { $Path -eq $neo4jPath }
@@ -64,6 +64,44 @@ InModuleScope Neo4j-Management {
         'Home' = $neo4jPath;
         'ServerVersion' = '99.99';
         'ServerType' = 'Community';
+      }
+      $result = Confirm-Neo4jServerObject -Neo4jServer $serverObject
+  
+      It "returns true" {
+        $result | Should be $true
+      }
+      It "attemtps to validate the path" {
+        Assert-MockCalled Test-Path -Times 1
+      }
+    }
+
+    Context "Valid Advanced Server Object" {
+      # Setup
+      $neo4jPath = 'TestDrive:\Neo4j'
+      Mock Test-Path { $true }  -ParameterFilter { $Path -eq $neo4jPath }
+      $serverObject = New-Object -TypeName PSCustomObject -Property @{
+        'Home' = $neo4jPath;
+        'ServerVersion' = '99.99';
+        'ServerType' = 'Advanced';
+      }
+      $result = Confirm-Neo4jServerObject -Neo4jServer $serverObject
+  
+      It "returns true" {
+        $result | Should be $true
+      }
+      It "attemtps to validate the path" {
+        Assert-MockCalled Test-Path -Times 1
+      }
+    }
+
+    Context "Valid Enterprise Server Object" {
+      # Setup
+      $neo4jPath = 'TestDrive:\Neo4j'
+      Mock Test-Path { $true }  -ParameterFilter { $Path -eq $neo4jPath }
+      $serverObject = New-Object -TypeName PSCustomObject -Property @{
+        'Home' = $neo4jPath;
+        'ServerVersion' = '99.99';
+        'ServerType' = 'Enterprise';
       }
       $result = Confirm-Neo4jServerObject -Neo4jServer $serverObject
   

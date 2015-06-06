@@ -77,16 +77,34 @@ Function Start-Neo4jServer
 
     if ($PsCmdlet.ParameterSetName -eq 'Console')
     {    
-  
+      # Note - For some reason -DserverMainClass must appear before -jar in the argument list.  Changing this order raises a Null Pointer Exception in the Windows Service Wrapper
+
+      $serverMainClass = ''
+      # Server Class Path for version 2.3 and above
+      if ($thisServer.ServerType -eq 'Advanced') { $serverMainClass = 'org.neo4j.server.advanced.AdvancedBootstrapper' }
+      if ($thisServer.ServerType -eq 'Enterprise') { $serverMainClass = 'org.neo4j.server.enterprise.EnterpriseBootstrapper' }
+      if ($thisServer.ServerType -eq 'Community') { $serverMainClass = 'org.neo4j.server.CommunityBootstrapper' }
+      # Server Class Path for version 2.2 and below
+      if ($thisServer.ServerVersion -match '^(2\.2|2\.1|2\.0|1\.)')
+      {
+        $serverMainClass = 'org.neo4j.server.Bootstrapper'
+      }
+      if ($serverMainClass -eq '') { Write-Error "Unable to determine the Server Main Class from the server information"; return }
+
       $ShellArgs = @( `
         "-DworkingDir=`"$($thisServer.Home)`"" `
         ,"-Djava.util.logging.config.file=`"$($thisServer.Home)\conf\windows-wrapper-logging.properties`"" `
         ,"-DconfigFile=`"conf/neo4j-wrapper.conf`"" `
         ,"-DserverClasspath=`"lib/*.jar;system/lib/*.jar;plugins/**/*.jar;./conf*`"" `
-        ,"-DserverMainClass=org.neo4j.server.Bootstrapper" `
-        ,"-jar","$($thisServer.Home)\bin\windows-service-wrapper-5.jar"      
+        ,"-DserverMainClass=$($serverMainClass)" `
+        ,"-jar","$($thisServer.Home)\bin\windows-service-wrapper-5.jar"
       )
-      $result = (Start-Process -FilePath $JavaCMD.java -ArgumentList $ShellArgs -Wait:$Wait -NoNewWindow:$Wait -PassThru -WorkingDirectory $thisServer.Home )
+
+      $result = 0
+      if ($PSCmdlet.ShouldProcess("$($JavaCMD.java) $($ShellArgs)", 'Start Neo4j'))
+      {
+        $result = (Start-Process -FilePath $JavaCMD.java -ArgumentList $ShellArgs -Wait:$Wait -NoNewWindow:$Wait -PassThru -WorkingDirectory $thisServer.Home)
+      }
       
       if ($PassThru) { Write-Output $thisServer } else { Write-Output $result.ExitCode }
     }
