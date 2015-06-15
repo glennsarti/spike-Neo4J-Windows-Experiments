@@ -20,9 +20,9 @@
 
 Function Get-Neo4jServerStatus
 {
-  [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Medium',DefaultParameterSetName='DefaultStatus')]
+  [cmdletBinding(SupportsShouldProcess=$false,ConfirmImpact='Medium',DefaultParameterSetName='LegacyStatus')]
   param (
-    [Parameter(Mandatory=$false,ValueFromPipeline=$true)]
+    [Parameter(Mandatory=$false,ValueFromPipeline=$true,ParameterSetName='LegacyStatus')]
     [object]$Neo4jServer = ''
 
     ,[Parameter(Mandatory=$false,ParameterSetName='LegacyStatus')]
@@ -90,11 +90,6 @@ Function Get-Neo4jServerStatus
       {
         Write-Host '"NOT INSTALLED"'
       }
-    }
-
-    if ($PsCmdlet.ParameterSetName -eq 'DefaultStatus')
-    {
-      Throw 'Not Implemented'
     }
   }
   

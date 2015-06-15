@@ -47,8 +47,6 @@ Function Install-Neo4jServer
     ,[Parameter(Mandatory=$false)]
     [Alias('Legacy')]
     [switch]$LegacyOutput
-    
-    # Optionally run the service under an account other than LOCAL SYSTEM?
   )
   
   Begin

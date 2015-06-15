@@ -37,6 +37,7 @@ Function Get-Java
   {
     $javaPath = ''
     $javaVersion = ''
+    $javaCMD = ''
     
     # Is JAVA specified in an environment variable
     if (($javaPath -eq '') -and ($Env:JAVA_HOME -ne $null))
@@ -87,8 +88,21 @@ Function Get-Java
       }
     }
     
-    $javaCMD = "$javaPath\bin\java.exe"
-    If (-not (Test-Path -Path $javaCMD)) { Throw "Found JAVAHOME but missing bin\java.exe"; return $null }
+    # Attempt to find Java in the search path
+    if ($javaPath -eq '')
+    {
+      $javaExe = (Get-Command 'java.exe' -ErrorAction SilentlyContinue)
+      if ($javaExe -ne $null)
+      {
+        $javaCMD = $javaExe.Path
+        $javaPath = Split-Path -Path $javaCMD -Parent
+      }
+    }
+
+    if ($javaVersion -eq '') { Write-Verbose 'Unable to determine Java version' }
+    if ($javaPath -eq '') { Throw "Unable to determine the path to java.exe"; return $null }
+    if ($javaCMD -eq '') { $javaCMD = "$javaPath\bin\java.exe" }
+    if (-not (Test-Path -Path $javaCMD)) { Throw "Could not find java at $javaCMD"; return $null }
 
     # Get the commandline args
     $RepoPath = Join-Path  -Path $BaseDir -ChildPath 'lib'
@@ -101,8 +115,7 @@ Function Get-Java
     $ExtraClassPath | ForEach-Object -Process { If (Test-Path -Path $_) { Write-Output $_} } | Get-ChildItem | Where-Object { $_.Extension -eq '.jar'} | % {
       $ClassPath += "`"$($_.FullName)`";"
     }
-    
-    
+        
     if ($ClassPath.Length -gt 0) { $ClassPath = $ClassPath.SubString(0, $ClassPath.Length-1) } # Strip the trailing semicolon if needed    
     
     $ShellArgs = @()

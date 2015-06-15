@@ -79,6 +79,8 @@ Function Start-Neo4jServer
     {    
       # Note - For some reason -DserverMainClass must appear before -jar in the argument list.  Changing this order raises a Null Pointer Exception in the Windows Service Wrapper
 
+
+throw "!!!" # Move this stuff into Get-Neo4jServer and remove duplication
       $serverMainClass = ''
       # Server Class Path for version 2.3 and above
       if ($thisServer.ServerType -eq 'Advanced') { $serverMainClass = 'org.neo4j.server.advanced.AdvancedBootstrapper' }
