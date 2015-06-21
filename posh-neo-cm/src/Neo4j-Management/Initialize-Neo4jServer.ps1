@@ -59,13 +59,13 @@ Delete the existing graph data files
 
 .PARAMETER DisableOnlineBackup
 Disable the online backup service
-This only applicable to Enterprise Neo4j Servers and will throw an error on Community servers
+This only applicable to Enterprise Neo4j Servers and will raise an error on Community servers
 
 .PARAMETER OnlineBackupServer
 Host and port number to listen for online backup service requests.  This can be a single host and port, or a single host and port range
 e.g. 127.0.0.1:6000 or 10.1.2.3:6000-6009
 If a port range is specified, Neo4j will attempt to listen on the next free port number, starting at the lowest.
-This only applicable to Enterprise Neo4j Servers and will throw an error on Community servers
+This only applicable to Enterprise Neo4j Servers and will raise an error on Community servers
  
 
 .Example
@@ -164,7 +164,7 @@ Function Initialize-Neo4jServer
 
     if ( ($thisServer.ServerType -ne 'Enterprise') -and ($DisableOnlineBackup -or ($OnlineBackupServer -ne '') ) )
     {
-      Throw "Neo4j Server type $($thisServer.ServerType) does not support online backup settings"
+      Write-Error "Neo4j Server type $($thisServer.ServerType) does not support online backup settings"
       return
     }
      
