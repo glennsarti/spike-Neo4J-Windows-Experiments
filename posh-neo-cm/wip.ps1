@@ -10,7 +10,8 @@ $ErrorActionPreference = 'Stop'
 
 Get-Module -Name 'Neo4j-Management' | Remove-Module
 #Import-Module "$PSScriptRoot\src\Neo4j-Management.psd1" | Out-Null
-Import-Module ".\src\Neo4j-Management.psd1" | Out-Null
+#Import-Module ".\src\Neo4j-Management.psd1" | Out-Null
+Import-Module ".\packaging\standalone\src\main\distribution\shell-scripts\bin\Neo4j-Management.psm1" | Out-Null
 
 #Get-Command -Module 'NeoTechnologies.Neo4jForWindows'
 
@@ -18,11 +19,16 @@ Import-Module ".\src\Neo4j-Management.psd1" | Out-Null
 Write-Host "---" -ForegroundColor Yellow
 
 
+'C:\tools\neo4j-community\neo4j-community-2.2.0' | start-Neo4jShell
+#'C:\tools\neo4j-community\neo4j-community-2.2.0' | `
+#  Initialize-Neo4jServer -ListenOnIPAddress 127.0.0.1 -HTTPPort 7474 -EnableRemoteShell -PassThru | `
+#  Install-Neo4jServer -PassThru | start-Neo4jServer
+
 # 'C:\tools\neo4j-enterprise\ORIG-neo4j-enterprise-2.3-SNAPSHOT'
 # 'C:\tools\neo4j-advanced\ORIG-neo4j-advanced-2.3-SNAPSHOT'
 # 'C:\tools\neo4j-community\ORIG-neo4j-community-2.3-SNAPSHOT'
 
-'C:\tools\neo4j-enterprise\ORIG-neo4j-enterprise-2.3-SNAPSHOT' | Get-Neo4jServer | Install-Neo4jServer -PassThru | Start-Neo4jServer
+#'C:\tools\neo4j-enterprise\ORIG-neo4j-enterprise-2.3-SNAPSHOT' | Get-Neo4jServer | Install-Neo4jServer -PassThru | Start-Neo4jServer
 
 #-=-=-= Import Test
 #Get-Neo4jServer "C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0" | `
