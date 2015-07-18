@@ -23,7 +23,7 @@
 Retrieves properties about a Neo4j installation
 
 .DESCRIPTION
-Retrieves properties about a Neo4j installation and outputs a Neo4j Server object.
+Retrieves properties about a Neo4j installation
 
 .PARAMETER Neo4jServer
 An object representing a Neo4j Server.  Either an empty string (path determined by Get-Neo4jHome), a string (path to Neo4j installation) or a valid Neo4j Server object
