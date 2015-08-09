@@ -7,10 +7,373 @@ Import-Module "$src\Neo4j-Management.psm1"
 
 InModuleScope Neo4j-Management {
   Describe "Get-Java" {
-    Context "Unit Tests" {
-      It "should have unit tests" {
-        $false | Should Be $true  
+
+    # Java Detection Tests
+    Context "Valid Java install in JAVA_HOME environment variable" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','TestPath:\JavaHome', "Process")
+      Mock Get-ItemProperty { return $null }
+      
+      Mock Test-Path -Verifiable { $true }  -ParameterFilter {
+        ($Path -eq 'TestPath:\JavaHome\bin\java.exe')
+      }
+            
+      $result = Get-Java
+
+      It "should return java location from registry" {
+        $result.java | Should Be 'TestPath:\JavaHome\bin\java.exe'
+      }
+
+      It "should have empty shell arguments" {
+        $result.args | Should BeNullOrEmpty
+      }
+
+      It "calls verified mocks" {
+        Assert-VerifiableMocks
       }
     }
+
+    Context "Invalid Java install in JAVA_HOME environment variable" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','TestPath:\JavaHome', "Process")
+      Mock Get-ItemProperty { return $null }
+
+      It "should throw if java missing" {
+        { Get-Java -ErrorAction Stop } | Should Throw
+      }
+    }
+
+    Context "Valid Java install in Registry (32bit Java on 64bit OS)" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','', "Process")
+      Mock Get-ItemProperty { return $null }
+      
+      Mock Test-Path -Verifiable { return $true } -ParameterFilter {
+        ($Path -eq 'Registry::HKLM\SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment')
+      }      
+      Mock Test-Path -Verifiable { $true }  -ParameterFilter {
+        ($Path -eq 'TestPath:\JavaHome\bin\java.exe')
+      }
+      Mock Get-ItemProperty -Verifiable { return @{ 'CurrentVersion' = '9.9'} } -ParameterFilter {
+        ($Path -eq 'Registry::HKLM\SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment')
+      }
+      Mock Get-ItemProperty -Verifiable { return @{ 'JavaHome' = 'TestPath:\JavaHome'} } -ParameterFilter {
+        ($Path -eq 'Registry::HKLM\SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment\9.9')
+      }
+            
+      $result = Get-Java
+
+      It "should return java location from registry" {
+        $result.java | Should Be 'TestPath:\JavaHome\bin\java.exe'
+      }
+
+      It "should have empty shell arguments" {
+        $result.args | Should BeNullOrEmpty
+      }
+
+      It "calls verified mocks" {
+        Assert-VerifiableMocks
+      }
+    }
+
+    Context "Invalid Java install in Registry (32bit Java on 64bit OS)" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','', "Process")
+      Mock Get-ItemProperty { return $null }
+      
+      Mock Test-Path -Verifiable { return $true } -ParameterFilter {
+        ($Path -eq 'Registry::HKLM\SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment')
+      }      
+      Mock Get-ItemProperty -Verifiable { return @{ 'CurrentVersion' = '9.9'} } -ParameterFilter {
+        ($Path -eq 'Registry::HKLM\SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment')
+      }
+      Mock Get-ItemProperty -Verifiable { return @{ 'JavaHome' = 'TestPath:\JavaHome'} } -ParameterFilter {
+        ($Path -eq 'Registry::HKLM\SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment\9.9')
+      }
+            
+      It "should throw if java missing" {
+        { Get-Java -ErrorAction Stop } | Should Throw
+      }
+
+      It "calls verified mocks" {
+        Assert-VerifiableMocks
+      }
+    }   
+
+    Context "Valid Java install in Registry" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','', "Process")
+      Mock Get-ItemProperty { return $null }
+      
+      Mock Test-Path -Verifiable { return $true } -ParameterFilter {
+        ($Path -eq 'Registry::HKLM\SOFTWARE\JavaSoft\Java Runtime Environment')
+      }      
+      Mock Test-Path -Verifiable { $true }  -ParameterFilter {
+        ($Path -eq 'TestPath:\JavaHome\bin\java.exe')
+      }
+      Mock Get-ItemProperty -Verifiable { return @{ 'CurrentVersion' = '9.9'} } -ParameterFilter {
+        ($Path -eq 'Registry::HKLM\SOFTWARE\JavaSoft\Java Runtime Environment')
+      }
+      Mock Get-ItemProperty -Verifiable { return @{ 'JavaHome' = 'TestPath:\JavaHome'} } -ParameterFilter {
+        ($Path -eq 'Registry::HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\9.9')
+      }
+            
+      $result = Get-Java
+
+      It "should return java location from registry" {
+        $result.java | Should Be 'TestPath:\JavaHome\bin\java.exe'
+      }
+
+      It "should have empty shell arguments" {
+        $result.args | Should BeNullOrEmpty
+      }
+
+      It "calls verified mocks" {
+        Assert-VerifiableMocks
+      }
+    }
+
+    Context "Invalid Java install in Registry" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','', "Process")
+      Mock Get-ItemProperty { return $null }
+      
+      Mock Test-Path -Verifiable { return $true } -ParameterFilter {
+        ($Path -eq 'Registry::HKLM\SOFTWARE\JavaSoft\Java Runtime Environment')
+      }      
+      Mock Get-ItemProperty -Verifiable { return @{ 'CurrentVersion' = '9.9'} } -ParameterFilter {
+        ($Path -eq 'Registry::HKLM\SOFTWARE\JavaSoft\Java Runtime Environment')
+      }
+      Mock Get-ItemProperty -Verifiable { return @{ 'JavaHome' = 'TestPath:\JavaHome'} } -ParameterFilter {
+        ($Path -eq 'Registry::HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\9.9')
+      }
+            
+      It "should throw if java missing" {
+        { Get-Java -ErrorAction Stop } | Should Throw
+      }
+
+      It "calls verified mocks" {
+        Assert-VerifiableMocks
+      }
+    }
+    
+    Context "Valid Java install in search path" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','', "Process")
+      Mock Get-ItemProperty { return $null }
+
+      Mock Get-Command -Verifiable { return @{ 'Path' = 'TestPath:\JavaHome\bin\java.exe' } }
+      Mock Test-Path -Verifiable { $true }  -ParameterFilter {
+        ($Path -eq 'TestPath:\JavaHome\bin\java.exe')
+      }
+            
+      $result = Get-Java
+
+      It "should return java location from registry" {
+        $result.java | Should Be 'TestPath:\JavaHome\bin\java.exe'
+      }
+
+      It "should have empty shell arguments" {
+        $result.args | Should BeNullOrEmpty
+      }
+
+      It "calls verified mocks" {
+        Assert-VerifiableMocks
+      }
+    }
+
+    Context "No Java install at all" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','', "Process")
+      Mock Get-ItemProperty { return $null }
+      Mock Get-Command { return $null }
+      
+      It "should throw if java not detected" {
+        { Get-Java -ErrorAction Stop } | Should Throw
+      }
+    }
+    
+    # ForServer tests
+    Context "Server Invoke - Community v2.3" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','TestPath:\JavaHome', "Process")
+      Mock Get-ItemProperty { return $null }      
+      Mock Test-Path { $true }  -ParameterFilter {
+        ($Path -eq 'TestPath:\JavaHome\bin\java.exe')
+      }
+      
+      $serverObject = (New-Object -TypeName PSCustomObject -Property @{
+        'Home' = 'TestDrive:\Path';
+        'ServerVersion' = '2.3';
+        'ServerType' = 'Community'
+      })
+
+      $result = Get-Java -ForServer -Neo4jServer $serverObject
+      $resultArgs = ($result.args -join ' ')
+
+      It "should have main class of org.neo4j.server.CommunityBootstrapper" {
+        $resultArgs | Should Match ([regex]::Escape('-DserverMainClass=org.neo4j.server.CommunityBootstrapper'))
+      }
+
+      It "should have correct WorkingDir" {
+        $resultArgs | Should Match ([regex]::Escape('-DworkingDir="TestDrive:\Path'))
+      }
+
+      It "should have DserverMainClass before jar in arguments" {
+        ($resultArgs.IndexOf('-DserverMainClass=') -lt $resultArgs.IndexOf(' -jar ')) | Should Be $true
+      }
+    }
+
+    Context "Server Invoke - Enterprise v2.3" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','TestPath:\JavaHome', "Process")
+      Mock Get-ItemProperty { return $null }      
+      Mock Test-Path { $true }  -ParameterFilter {
+        ($Path -eq 'TestPath:\JavaHome\bin\java.exe')
+      }
+      
+      $serverObject = (New-Object -TypeName PSCustomObject -Property @{
+        'Home' = 'TestDrive:\Path';
+        'ServerVersion' = '2.3';
+        'ServerType' = 'Enterprise'
+      })
+
+      $result = Get-Java -ForServer -Neo4jServer $serverObject
+      $resultArgs = ($result.args -join ' ')
+
+      It "should have main class of org.neo4j.server.enterprise.EnterpriseBootstrapper" {
+        $resultArgs | Should Match ([regex]::Escape('-DserverMainClass=org.neo4j.server.enterprise.EnterpriseBootstrapper'))
+      }
+
+      It "should have correct WorkingDir" {
+        $resultArgs | Should Match ([regex]::Escape('-DworkingDir="TestDrive:\Path'))
+      }
+
+      It "should have DserverMainClass before jar in arguments" {
+        ($resultArgs.IndexOf('-DserverMainClass=') -lt $resultArgs.IndexOf(' -jar ')) | Should Be $true
+      }
+    }
+
+    Context "Server Invoke - Advanced v2.3" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','TestPath:\JavaHome', "Process")
+      Mock Get-ItemProperty { return $null }      
+      Mock Test-Path { $true }  -ParameterFilter {
+        ($Path -eq 'TestPath:\JavaHome\bin\java.exe')
+      }
+      
+      $serverObject = (New-Object -TypeName PSCustomObject -Property @{
+        'Home' = 'TestDrive:\Path';
+        'ServerVersion' = '2.3';
+        'ServerType' = 'Advanced'
+      })
+
+      $result = Get-Java -ForServer -Neo4jServer $serverObject
+      $resultArgs = ($result.args -join ' ')
+
+      It "should have main class of org.neo4j.server.advanced.AdvancedBootstrapper" {
+        $resultArgs | Should Match ([regex]::Escape('-DserverMainClass=org.neo4j.server.advanced.AdvancedBootstrapper'))
+      }
+
+      It "should have correct WorkingDir" {
+        $resultArgs | Should Match ([regex]::Escape('-DworkingDir="TestDrive:\Path'))
+      }
+
+      It "should have DserverMainClass before jar in arguments" {
+        ($resultArgs.IndexOf('-DserverMainClass=') -lt $resultArgs.IndexOf(' -jar ')) | Should Be $true
+      }
+    }
+
+    Context "Server Invoke - Community v2.2" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','TestPath:\JavaHome', "Process")
+      Mock Get-ItemProperty { return $null }      
+      Mock Test-Path { $true }  -ParameterFilter {
+        ($Path -eq 'TestPath:\JavaHome\bin\java.exe')
+      }
+      
+      $serverObject = (New-Object -TypeName PSCustomObject -Property @{
+        'Home' = 'TestDrive:\Path';
+        'ServerVersion' = '2.2';
+        'ServerType' = 'Community'
+      })
+
+      $result = Get-Java -ForServer -Neo4jServer $serverObject
+      $resultArgs = ($result.args -join ' ')
+
+      It "should have main class of org.neo4j.server.Bootstrapper" {
+        $resultArgs | Should Match ([regex]::Escape('-DserverMainClass=org.neo4j.server.Bootstrapper'))
+      }
+    }
+
+    Context "Server Invoke - Community v2.1" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','TestPath:\JavaHome', "Process")
+      Mock Get-ItemProperty { return $null }      
+      Mock Test-Path { $true }  -ParameterFilter {
+        ($Path -eq 'TestPath:\JavaHome\bin\java.exe')
+      }
+      
+      $serverObject = (New-Object -TypeName PSCustomObject -Property @{
+        'Home' = 'TestDrive:\Path';
+        'ServerVersion' = '2.1';
+        'ServerType' = 'Community'
+      })
+
+      $result = Get-Java -ForServer -Neo4jServer $serverObject
+      $resultArgs = ($result.args -join ' ')
+
+      It "should have main class of org.neo4j.server.Bootstrapper" {
+        $resultArgs | Should Match ([regex]::Escape('-DserverMainClass=org.neo4j.server.Bootstrapper'))
+      }
+    }
+
+    Context "Server Invoke - Community v2.0" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','TestPath:\JavaHome', "Process")
+      Mock Get-ItemProperty { return $null }      
+      Mock Test-Path { $true }  -ParameterFilter {
+        ($Path -eq 'TestPath:\JavaHome\bin\java.exe')
+      }
+      
+      $serverObject = (New-Object -TypeName PSCustomObject -Property @{
+        'Home' = 'TestDrive:\Path';
+        'ServerVersion' = '2.0';
+        'ServerType' = 'Community'
+      })
+
+      $result = Get-Java -ForServer -Neo4jServer $serverObject
+      $resultArgs = ($result.args -join ' ')
+
+      It "should have main class of org.neo4j.server.Bootstrapper" {
+        $resultArgs | Should Match ([regex]::Escape('-DserverMainClass=org.neo4j.server.Bootstrapper'))
+      }
+    }
+
+
+    Context "Server Invoke - Community v1.9" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','TestPath:\JavaHome', "Process")
+      Mock Get-ItemProperty { return $null }      
+      Mock Test-Path { $true }  -ParameterFilter {
+        ($Path -eq 'TestPath:\JavaHome\bin\java.exe')
+      }
+      
+      $serverObject = (New-Object -TypeName PSCustomObject -Property @{
+        'Home' = 'TestDrive:\Path';
+        'ServerVersion' = '1.9';
+        'ServerType' = 'Community'
+      })
+
+      $result = Get-Java -ForServer -Neo4jServer $serverObject
+      $resultArgs = ($result.args -join ' ')
+
+      It "should have main class of org.neo4j.server.Bootstrapper" {
+        $resultArgs | Should Match ([regex]::Escape('-DserverMainClass=org.neo4j.server.Bootstrapper'))
+      }
+    }
+    
+    throw "Need to do Utility Invoke and extraclass parameter tests"
+
   }
 }
