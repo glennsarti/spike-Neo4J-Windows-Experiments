@@ -373,7 +373,79 @@ InModuleScope Neo4j-Management {
       }
     }
     
-    throw "Need to do Utility Invoke and extraclass parameter tests"
+    # Utility Invoke
+    Context "Utility Invoke" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','TestPath:\JavaHome', "Process")
+      Mock Get-ItemProperty { return $null }      
+      Mock Test-Path { $true }  -ParameterFilter {
+        ($Path -eq 'TestPath:\JavaHome\bin\java.exe') -or
+        ($Path -eq 'TestDrive:\FakeExtraClass')
+      }
+      Mock Get-ChildItem { @(
+        @{ 'Extension'='.jar'; 'Fullname'='TestDrive:\fake1.jar'}
+      )} -ParameterFilter { $Path -eq 'TestDrive:\Path\lib' }
+      Mock Get-ChildItem { @(
+        @{ 'Extension'='.jar'; 'Fullname'='TestDrive:\FakeExtraClass\fake2.jar'}
+      )} -ParameterFilter { $Path -eq 'TestDrive:\FakeExtraClass' }
+      
+      $serverObject = (New-Object -TypeName PSCustomObject -Property @{
+        'Home' = 'TestDrive:\Path'; 'ServerVersion' = '99.99'; 'ServerType' = 'Community'
+      })
 
+      $result = Get-Java -ForUtility -AppName 'someapp' -StartingClass 'someclass' -ExtraClassPath 'TestDrive:\FakeExtraClass' -Neo4jServer $serverObject -ErrorAction Stop
+      $resultArgs = ($result.args -join ' ')
+
+      It "should have correct ClassPath" {
+        $resultArgs | Should Match ([regex]::Escape('-classpath ;"TestDrive:\fake1.jar";"TestDrive:\FakeExtraClass\fake2.jar"'))
+      }
+      It "should have correct Repo" {
+        $resultArgs | Should Match ([regex]::Escape('-Dapp.repo="TestDrive:\Path\lib"'))
+      }
+      It "should have correct BaseDir" {
+        $resultArgs | Should Match ([regex]::Escape('-Dbasedir="TestDrive:\Path'))
+      }
+      It "should have correct App" {
+        $resultArgs | Should Match ([regex]::Escape('-Dapp.name=someapp'))
+      }
+      It "should have correct Starting Class" {
+        $resultArgs | Should Match ([regex]::Escape(' someclass'))
+      }
+    }    
+
+    # Arbiter Invoke
+    Context "Arbiter Invoke" {
+      Mock Test-Path { $false }
+      [Environment]::SetEnvironmentVariable('JAVA_HOME','TestPath:\JavaHome', "Process")
+      Mock Get-ItemProperty { return $null }      
+      Mock Test-Path { $true }  -ParameterFilter {
+        ($Path -eq 'TestPath:\JavaHome\bin\java.exe')
+      }
+      
+      $serverObject = (New-Object -TypeName PSCustomObject -Property @{
+        'Home' = 'TestDrive:\Path';
+        'ServerVersion' = '2.3';
+        'ServerType' = 'Enterprise'
+      })
+
+      $result = Get-Java -ForArbiter -Neo4jServer $serverObject
+      $resultArgs = ($result.args -join ' ')
+
+      It "should have main class of org.neo4j.server.advanced.AdvancedBootstrapper" {
+        $resultArgs | Should Match ([regex]::Escape('-DserverMainClass=org.neo4j.server.enterprise.StandaloneClusterClient'))
+      }
+
+      It "should have correct WorkingDir" {
+        $resultArgs | Should Match ([regex]::Escape('-DworkingDir="TestDrive:\Path'))
+      }
+
+      It "should have correct Config File" {
+        $resultArgs | Should Match ([regex]::Escape('-DconfigFile="conf/arbiter-wrapper.conf"'))
+      }
+
+      It "should have DserverMainClass before jar in arguments" {
+        ($resultArgs.IndexOf('-DserverMainClass=') -lt $resultArgs.IndexOf(' -jar ')) | Should Be $true
+      }
+    }
   }
 }

@@ -18,7 +18,7 @@ Import-Module "$($PSScriptRoot)\packaging\standalone\src\main\distribution\shell
 #"C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0","C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jServer
 Write-Host "---" -ForegroundColor Yellow
 
-Get-Help Initialize-Neo4jServer -full
+Get-Help Remove-Neo4jSetting -full
 
 #'C:\tools\neo4j-community\neo4j-community-2.2.0' | start-Neo4jShell
 #'C:\tools\neo4j-community\neo4j-community-2.2.0' | `
