@@ -18,7 +18,17 @@ Import-Module "$($PSScriptRoot)\packaging\standalone\src\main\distribution\shell
 #"C:\tools\neo4j-enterprise\neo4j-enterprise-2.2.0","C:\tools\neo4j-community\neo4j-community-2.2.0" | Get-Neo4jServer
 Write-Host "---" -ForegroundColor Yellow
 
-Get-Help Remove-Neo4jSetting -full
+#Get-Help Remove-Neo4jSetting -full
+
+Write-Host "---" -ForegroundColor Yellow
+'C:\Neo4j\' | start-Neo4jServer -Console -Wait -WhatIf
+Write-Host "---" -ForegroundColor Yellow
+'C:\Neo4j\bin\..' | start-Neo4jServer -Console -Wait -WhatIf
+Write-Host "---" -ForegroundColor Yellow
+'C:\Neo4jxxx' | start-Neo4jServer -Console -Wait -WhatIf
+Write-Host "---" -ForegroundColor Yellow
+'C:\Neo4j' | start-Neo4jServer -Console -Wait -WhatIf
+Write-Host "---" -ForegroundColor Yellow
 
 #'C:\tools\neo4j-community\neo4j-community-2.2.0' | start-Neo4jShell
 #'C:\tools\neo4j-community\neo4j-community-2.2.0' | `
